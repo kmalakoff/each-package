@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+var eachPackage = require('..');
+
+if (process.argv.length < 3) {
+  console.log('Missing arguments. Example usage: each-package [command]');
+  return process.exit(-1);
+}
+
+eachPackage(process.argv.slice(2), function (err) {
+  if (err) {
+    console.log(err.message);
+    return process.exit(err.exitCode || -1);
+  }
+  process.exit(0);
+});
