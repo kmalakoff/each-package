@@ -17,7 +17,7 @@
     "format": "prettier --write '**/*.js'"
   },
   "dependencies": {
-    "call-once-next-tick": "^1.0.2",
+    "call-once-next-tick": "^1.0.3",
     "cross-spawn": "^5.1.0",
     "fs-iterator": "^2.6.0"
   },
