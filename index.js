@@ -25,6 +25,7 @@ module.exports = function eachPackage(command, options, callback) {
       if (entry.stats.isFile()) return entry.basename === 'package.json';
     },
     alwaysStat: true,
+    concurrency: 1,
   });
   iterator.forEach(
     function (entry, callback) {
