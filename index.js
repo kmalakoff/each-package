@@ -25,14 +25,13 @@ module.exports = function eachPackage(command, options, callback) {
       if (entry.stats.isFile()) return entry.basename === 'package.json';
     },
     alwaysStat: true,
-    concurrency: 1,
   });
   iterator.forEach(
     function (entry, callback) {
       if (!entry.stats.isFile()) return callback();
       execCommand(command, { relativePath: path.dirname(entry.path), cwd: path.dirname(entry.fullPath), silent: options.silent }, callback);
     },
-    { callbacks: true },
+    { callbacks: true, concurrency: 1 },
     callback
   );
 };
