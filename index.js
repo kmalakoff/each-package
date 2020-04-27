@@ -3,17 +3,7 @@ var Iterator = require('fs-iterator');
 
 var exec = require('./lib/exec');
 
-function execCommand(command, options, callback) {
-  if (!options.silent) {
-    console.log('\n----------------------');
-    console.log(command.join(' ') + ' (' + options.relativePath + ')');
-    console.log('----------------------');
-  }
-  // console.log()
-  exec(command, options, callback);
-}
-
-module.exports = function eachPackage(command, options, callback) {
+module.exports = function eachPackage(command, args, options, callback) {
   if (typeof options === 'function') {
     callback = options;
     options = {};
@@ -33,8 +23,8 @@ module.exports = function eachPackage(command, options, callback) {
     function (entry, callback) {
       if (!entry.stats.isFile()) return callback();
       counter++;
-      execCommand(command, { relativePath: path.dirname(entry.path), cwd: path.dirname(entry.fullPath), silent: options.silent }, function (err) {
-        if (err) errors.push({ command: command, entry: entry, error: err });
+      exec(command, args, { relativePath: path.dirname(entry.path), cwd: path.dirname(entry.fullPath), silent: options.silent }, function (err) {
+        if (err) errors.push({ entry: entry, error: err });
         callback();
       });
     },
