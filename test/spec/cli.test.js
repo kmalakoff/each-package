@@ -1,25 +1,31 @@
 var assert = require('assert');
 var path = require('path');
-
-var exec = require('../../lib/exec');
+var execa = require('execa');
 
 describe('cli', function () {
   describe('happy path', function () {
     it('basic command', function (done) {
-      exec([path.join(__dirname, '..', '..', 'bin', 'each-package'), 'node', '--version'], function (err, code) {
-        assert.ok(!err);
-        assert.equal(code, 0);
-        done();
-      });
+      execa(path.join(__dirname, '..', '..', 'bin', 'each-package'), ['node', '--version'])
+        .then(function (res) {
+          assert.equal(res.exitCode, 0);
+          done();
+        })
+        .catch(function (err) {
+          assert.ok(!err);
+        });
     });
   });
 
   describe('unhappy path', function () {
     it('missing command', function (done) {
-      exec([path.join(__dirname, '..', '..', 'bin', 'each-package')], function (err, code) {
-        assert.ok(!!err);
-        done();
-      });
+      execa(path.join(__dirname, '..', '..', 'bin', 'each-package'), [])
+        .then(function () {
+          assert.ok(false);
+        })
+        .catch(function (err) {
+          assert.ok(!!err);
+          done();
+        });
     });
   });
 });
