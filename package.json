@@ -14,7 +14,7 @@
     "test"
   ],
   "bin": {
-    "each-package": "./bin/each-package"
+    "ep": "./bin/each-package"
   },
   "license": "MIT",
   "scripts": {
