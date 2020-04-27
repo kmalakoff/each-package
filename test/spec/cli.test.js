@@ -1,31 +1,25 @@
 var assert = require('assert');
 var path = require('path');
-var execa = require('execa');
+var spawn = require('cross-spawn-cb');
 
 describe('cli', function () {
   describe('happy path', function () {
     it('basic command', function (done) {
-      execa(path.join(__dirname, '..', '..', 'bin', 'each-package'), ['node', '--version'])
-        .then(function (res) {
-          assert.equal(res.exitCode, 0);
-          done();
-        })
-        .catch(function (err) {
-          assert.ok(!err);
-        });
+      spawn(path.join(__dirname, '..', '..', 'bin', 'each-package'), ['node', '--version'], { stdio: 'inherit' }, function (err, res) {
+        assert.ok(!err);
+        assert.equal(res.exitCode, 0);
+        done();
+      });
     });
   });
 
   describe('unhappy path', function () {
     it('missing command', function (done) {
-      execa(path.join(__dirname, '..', '..', 'bin', 'each-package'), [])
-        .then(function () {
-          assert.ok(false);
-        })
-        .catch(function (err) {
-          assert.ok(!!err);
-          done();
-        });
+      spawn(path.join(__dirname, '..', '..', 'bin', 'each-package'), [], { stdio: 'inherit' }, function (err, res) {
+        assert.ok(!err);
+        assert.ok(res.exitCode !== 0);
+        done();
+      });
     });
   });
 });

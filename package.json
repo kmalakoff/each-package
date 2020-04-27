@@ -1,11 +1,18 @@
 {
   "name": "each-package",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Run commands in each package folder starting with cwd skipping node_modules folders",
   "repository": {
     "type": "git",
     "url": "git@github.com:kmalakoff/each-package.git"
   },
+  "keywords": [
+    "each",
+    "package",
+    "npm",
+    "install",
+    "test"
+  ],
   "bin": {
     "each-package": "./bin/each-package"
   },
@@ -17,7 +24,7 @@
     "format": "prettier --write '**/*.js'"
   },
   "dependencies": {
-    "execa": "^4.0.0",
+    "cross-spawn-cb": "^0.1.1",
     "fs-iterator": "^2.6.0"
   },
   "devDependencies": {
@@ -29,10 +36,9 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "lodash.constant": "^3.0.0",
     "mocha": "^7.1.2",
     "mocha-compat": "^3.5.5",
-    "nvs": "^0.1.5",
+    "nvs": "^0.1.8",
     "prettier": "^2.0.5"
   }
 }
