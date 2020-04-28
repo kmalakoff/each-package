@@ -9,6 +9,7 @@ module.exports = function eachPackage(command, args, options, callback) {
     options = {};
   }
   options = options || {};
+
   var iterator = new Iterator(process.cwd(), {
     filter: function filter(entry) {
       if (entry.stats.isDirectory()) return entry.basename !== '.git' && entry.basename !== 'node_modules';
