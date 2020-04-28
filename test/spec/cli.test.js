@@ -5,7 +5,7 @@ var spawn = require('cross-spawn-cb');
 describe('cli', function () {
   describe('happy path', function () {
     it('basic command', function (done) {
-      spawn(path.join(__dirname, '..', '..', 'bin', 'each-package'), ['node', '--version'], { stdio: 'inherit' }, function (err, res) {
+      spawn(path.join(__dirname, '..', '..', 'bin', 'each-package'), ['--', 'node', '--version'], { stdio: 'inherit' }, function (err, res) {
         assert.ok(!err);
         assert.equal(res.exitCode, 0);
         done();

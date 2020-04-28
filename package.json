@@ -1,6 +1,6 @@
 {
   "name": "each-package",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "Run commands in each package folder starting with cwd skipping node_modules folders",
   "repository": {
     "type": "git",
@@ -24,6 +24,7 @@
     "format": "prettier --write '**/*.js'"
   },
   "dependencies": {
+    "commander": "^2.20.3",
     "cross-spawn-cb": "^0.1.1",
     "fs-iterator": "^3.0.1"
   },
