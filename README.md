@@ -4,5 +4,10 @@ Run commands in each package folder starting with cwd skipping node_modules fold
 
 ```
 $ep run npm
+```
+
+Use '--' if the command has options of their own.
+
+```
 $ep -- node --version
 ```
