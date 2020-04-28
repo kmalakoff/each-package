@@ -2,11 +2,7 @@
 
 var program = require('commander');
 
-function parseInteger(value) {
-  return ++value;
-}
-
-program.option('-d, --depth <depth>', 'depth', parseInteger, Infinity);
+program.option('-d, --depth <depth>', 'depth', parseInt, Infinity);
 program.parse(process.argv);
 
 var args = Array.prototype.slice.call(program.args, 0);
