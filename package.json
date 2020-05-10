@@ -2,10 +2,6 @@
   "name": "each-package",
   "version": "0.2.3",
   "description": "Run commands in each package folder starting with cwd skipping node_modules folders",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:kmalakoff/each-package.git"
-  },
   "keywords": [
     "each",
     "package",
@@ -13,15 +9,20 @@
     "install",
     "test"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:kmalakoff/each-package.git"
+  },
+  "license": "MIT",
+  "main": "index.js",
   "bin": {
     "ep": "./bin/each-package"
   },
-  "license": "MIT",
   "scripts": {
-    "test": "mocha-compat test/spec/**/*.test.js",
-    "compat": "nvs 14,12,10,8,6,4,0.12,0.10,0.8 mocha-compat test/spec/**/*.test.js",
+    "compat": "nvs --engines mocha-compat test/spec/**/*.test.js",
+    "format": "prettier --write '**/*.js'",
     "lint": "eslint .",
-    "format": "prettier --write '**/*.js'"
+    "test": "mocha-compat test/spec/**/*.test.js"
   },
   "dependencies": {
     "commander": "^2.20.3",
@@ -38,7 +39,10 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "mocha-compat": "^3.5.5",
-    "nvs": "^0.2.0",
+    "nvs": "^0.3.0",
     "prettier": "^2.0.5"
+  },
+  "engines": {
+    "node": ">=0.8.0"
   }
 }
