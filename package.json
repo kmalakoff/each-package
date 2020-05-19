@@ -1,6 +1,6 @@
 {
   "name": "each-package",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Run commands in each package folder starting with cwd skipping node_modules folders",
   "keywords": [
     "each",
@@ -25,9 +25,9 @@
     "test": "mocha-compat test/spec/**/*.test.js  --no-timeouts"
   },
   "dependencies": {
-    "commander": "^2.20.3",
     "cross-spawn-cb": "^0.2.4",
-    "fs-iterator": "^3.0.1"
+    "fs-iterator": "^3.0.1",
+    "yargs-parser": "^16.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
