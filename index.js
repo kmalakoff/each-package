@@ -1,3 +1,4 @@
+var path = require('path');
 var Iterator = require('fs-iterator');
 var spawn = require('cross-spawn-cb');
 
@@ -27,12 +28,12 @@ module.exports = function eachPackage(command, args, options, callback) {
 
       if (!options.silent) {
         console.log('\n----------------------');
-        console.log([command].concat(args).join(' ') + ' (' + options.relativePath + ')');
+        console.log([command].concat(args).join(' ') + ' (' + path.dirname(entry.path) + ')');
         console.log('----------------------');
       }
 
       counter++;
-      spawn(command, args, { stdio: 'inherit', cwd: options.cwd }, function (err, res) {
+      spawn(command, args, { stdio: 'inherit', cwd: path.dirname(entry.fullPath) }, function (err, res) {
         if (err) return callback(err);
         if (res.code !== 0) errors.push({ entry: entry, res: res });
         callback();
