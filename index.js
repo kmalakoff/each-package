@@ -1,7 +1,5 @@
-var path = require('path');
 var Iterator = require('fs-iterator');
-
-var exec = require('./lib/exec');
+var spawn = require('cross-spawn-cb');
 
 module.exports = function eachPackage(command, args, options, callback) {
   if (typeof options === 'function') {
@@ -10,12 +8,15 @@ module.exports = function eachPackage(command, args, options, callback) {
   }
   options = options || {};
 
+  var depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
+  if (depth !== Infinity) depth++; // depth is relative to first level of packages
+
   var iterator = new Iterator(process.cwd(), {
     filter: function filter(entry) {
       if (entry.stats.isDirectory()) return entry.basename !== '.git' && entry.basename !== 'node_modules';
       if (entry.stats.isFile()) return entry.basename === 'package.json';
     },
-    depth: typeof options.depth === 'undefined' ? Infinity : options.depth,
+    depth: depth,
   });
 
   var counter = 0;
@@ -23,8 +24,15 @@ module.exports = function eachPackage(command, args, options, callback) {
   iterator.forEach(
     function (entry, callback) {
       if (!entry.stats.isFile()) return callback();
+
+      if (!options.silent) {
+        console.log('\n----------------------');
+        console.log([command].concat(args).join(' ') + ' (' + options.relativePath + ')');
+        console.log('----------------------');
+      }
+
       counter++;
-      exec(command, args, { relativePath: path.dirname(entry.path), cwd: path.dirname(entry.fullPath), silent: options.silent }, function (err, res) {
+      spawn(command, args, { stdio: 'inherit', cwd: options.cwd }, function (err, res) {
         if (err) return callback(err);
         if (res.code !== 0) errors.push({ entry: entry, res: res });
         callback();
