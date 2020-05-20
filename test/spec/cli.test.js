@@ -22,7 +22,7 @@ describe('cli', function () {
       });
     });
 
-    it('basic command with options', function (done) {
+    it('basic command with options (--)', function (done) {
       spawn(CLI, ['--', 'node', '--version'], { stdio: 'inherit' }, function (err, res) {
         assert.ok(!err);
         assert.equal(res.code, 0);
