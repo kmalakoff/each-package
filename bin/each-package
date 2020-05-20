@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 
-var options = require('yargs-parser')(process.argv.slice(2), {
-  configuration: { 'halt-at-non-option': true },
+const getopts = require('getopts-compat');
+
+var options = getopts(process.argv.slice(2), {
+  alias: { depth: 'd' },
+  default: { depth: Infinity },
+  stopEarly: true,
 });
+
+// define.option('-d, --depth <depth>', 'depth', parseInt, Infinity);
 
 var args = options._;
 if (!args.length) {
