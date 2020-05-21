@@ -3,7 +3,8 @@
 var getopts = require('getopts-compat');
 
 var options = getopts(process.argv.slice(2), {
-  alias: { depth: 'd' },
+  alias: { depth: 'd', silent: 's' },
+  boolean: ['silent'],
   default: { depth: Infinity },
   stopEarly: true,
 });
@@ -18,10 +19,26 @@ if (!args.length) {
 
 var eachPackage = require('..');
 
-eachPackage(args[0], args.slice(1), options, function (err) {
+eachPackage(args[0], args.slice(1), options, function (err, results) {
   if (err) {
     console.log(err.message);
     return process.exit(err.code || -1);
   }
-  process.exit(0);
+  var errors = [];
+  for (var index = 0; index < results.length; index++) {
+    if (results[index].result.code !== 0) errors.push(results[index]);
+  }
+
+  if (!options.silent) {
+    console.log('\n**********************');
+    if (errors.length) {
+      // eslint-disable-next-line no-redeclare
+      for (var index = 0; index < errors.length; index++) {
+        console.log(errors[index].path, errors[index].result.code);
+      }
+    } else console.log('Success (' + results.length + ')');
+    console.log('**********************');
+  }
+
+  process.exit(errors.length ? -1 : 0);
 });
