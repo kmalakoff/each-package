@@ -19,7 +19,6 @@
     "ep": "./bin/each-package"
   },
   "scripts": {
-    "compat": "nvs --engines -- mocha-compat test/spec/**/*.test.js --no-timeouts",
     "format": "eslint . --fix",
     "lint": "eslint .",
     "test": "mocha-compat test/spec/**/*.test.js  --no-timeouts"
@@ -41,7 +40,6 @@
     "eslint-plugin-standard": "^4.0.1",
     "is-version": "^0.2.0",
     "mocha-compat": "^3.5.5",
-    "nvs": "^0.4.4",
     "prettier": "^2.0.5"
   },
   "engines": {
