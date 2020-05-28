@@ -17,7 +17,15 @@ if (!args.length) {
   return process.exit(-1);
 }
 
+var path = require('path');
 var eachPackage = require('..');
+
+if (!options.silent)
+  options.header = function (entry, command, ars) {
+    console.log('\n----------------------');
+    console.log([command].concat(args).join(' ') + ' (' + path.dirname(entry.path) + ')');
+    console.log('----------------------');
+  };
 
 eachPackage(args[0], args.slice(1), options, function (err, results) {
   if (err) {
@@ -30,14 +38,15 @@ eachPackage(args[0], args.slice(1), options, function (err, results) {
   }
 
   if (!options.silent) {
-    console.log('\n**********************');
+    console.log('\n======================');
     if (errors.length) {
+      console.log('Errors (' + errors.length + ')');
       // eslint-disable-next-line no-redeclare
       for (var index = 0; index < errors.length; index++) {
         console.log(errors[index].path, errors[index].result.code);
       }
     } else console.log('Success (' + results.length + ')');
-    console.log('**********************');
+    console.log('======================');
   }
 
   process.exit(errors.length ? -1 : 0);
