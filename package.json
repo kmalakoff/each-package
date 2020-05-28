@@ -19,20 +19,19 @@
     "ep": "./bin/each-package"
   },
   "scripts": {
-    "compat": "nvs --engines -- mocha-compat test/spec/**/*.test.js --no-timeouts",
-    "format": "prettier --write '**/*.js'",
+    "format": "eslint . --fix",
     "lint": "eslint .",
     "test": "mocha-compat test/spec/**/*.test.js  --no-timeouts"
   },
   "dependencies": {
     "cross-spawn-cb": "^0.2.4",
-    "fs-iterator": "^3.0.2",
+    "fs-iterator": "^3.0.3",
     "getopts-compat": "^2.2.5",
     "object-assign": "^4.1.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.0.0",
+    "eslint": "^7.1.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.2",
@@ -41,7 +40,6 @@
     "eslint-plugin-standard": "^4.0.1",
     "is-version": "^0.2.0",
     "mocha-compat": "^3.5.5",
-    "nvs": "^0.4.4",
     "prettier": "^2.0.5"
   },
   "engines": {

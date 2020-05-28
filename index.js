@@ -25,13 +25,7 @@ module.exports = function eachPackage(command, args, options, callback) {
   iterator.forEach(
     function (entry, callback) {
       if (!entry.stats.isFile()) return callback();
-
-      if (!options.silent) {
-        console.log('\n----------------------');
-        console.log([command].concat(args).join(' ') + ' (' + path.dirname(entry.path) + ')');
-        console.log('----------------------');
-      }
-
+      if (options.header) options.header(entry, command, args);
       var spawnOptions = assign({}, options, { cwd: path.dirname(entry.fullPath) });
       if (!spawnOptions.stdout && !spawnOptions.stdio) spawnOptions.stdio = 'inherit';
 
