@@ -21,7 +21,7 @@ var path = require('path');
 var eachPackage = require('..');
 
 if (!options.silent)
-  options.header = function (entry, command, ars) {
+  options.header = function (entry, command, args) {
     console.log('\n----------------------');
     console.log([command].concat(args).join(' ') + ' (' + path.dirname(entry.path) + ')');
     console.log('----------------------');
