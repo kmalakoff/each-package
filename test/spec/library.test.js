@@ -3,7 +3,7 @@ var isVersion = require('is-version');
 
 var eachPackage = require('../..');
 
-var EOL = /\r\n|\r|\n/;
+var EOL = process.platform === 'win32' ? '\r\n' : '\n';
 
 describe('library', function () {
   describe('happy path', function () {
