@@ -21,17 +21,16 @@ module.exports = function eachPackage(command, args, options, callback) {
     depth: depth,
   });
 
+  var spawnOptions = assign({}, options);
+  if (!spawnOptions.stdout && !spawnOptions.stdio) spawnOptions.stdio = 'inherit';
+
   var results = [];
   iterator.forEach(
     function (entry, callback) {
       if (!entry.stats.isFile()) return callback();
-      if (options.header) options.header(entry, command, args);
-      var spawnOptions = assign({}, options, { cwd: path.dirname(entry.fullPath) });
-      if (!spawnOptions.stdout && !spawnOptions.stdio) spawnOptions.stdio = 'inherit';
-
-      spawn(command, args, spawnOptions, function (err, res) {
-        if (err) return callback(err);
-        results.push({ path: entry.path, result: res });
+      !options.header || options.header(entry, command, args);
+      spawn(command, args, assign({}, spawnOptions, { cwd: path.dirname(entry.fullPath) }), function (err, res) {
+        results.push({ path: entry.path, error: err, result: res });
         callback();
       });
     },
