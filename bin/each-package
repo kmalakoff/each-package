@@ -34,7 +34,8 @@ eachPackage(args[0], args.slice(1), options, function (err, results) {
   }
   var errors = [];
   for (var index = 0; index < results.length; index++) {
-    if (results[index].result.code !== 0) errors.push(results[index]);
+    var result = results[index];
+    if (result.error || result.result.code !== 0) errors.push(results[index]);
   }
 
   if (!options.silent) {
@@ -43,7 +44,10 @@ eachPackage(args[0], args.slice(1), options, function (err, results) {
       console.log('Errors (' + errors.length + ')');
       // eslint-disable-next-line no-redeclare
       for (var index = 0; index < errors.length; index++) {
-        console.log(errors[index].path, errors[index].result.code);
+        // eslint-disable-next-line no-redeclare
+        var result = errors[index];
+        if (result.error) console.log(result.path + ' Error: ' + result.error.message);
+        else console.log(result.path + ' Exit Code: ' + result.code);
       }
     } else console.log('Success (' + results.length + ')');
     console.log('======================');
