@@ -14,5 +14,17 @@ describe('library', function () {
         done();
       });
     });
+    it('basic command (promises)', function (done) {
+      if (typeof Promise === 'undefined') return;
+
+      eachPackage('node', ['--version'], { silent: true, stdout: 'string' })
+        .then(function (results) {
+          assert.ok(isVersion(results[0].result.stdout.split(EOL).slice(-2, -1)[0], 'v'));
+          done();
+        })
+        .catch(function (err) {
+          assert.ok(!err);
+        });
+    });
   });
 });

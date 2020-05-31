@@ -9,6 +9,7 @@ var options = getopts(process.argv.slice(2), {
   stopEarly: true,
 });
 
+// define.option('-s, --silent, 'silent');
 // define.option('-d, --depth <depth>', 'depth', parseInt, Infinity);
 
 var args = options._;
