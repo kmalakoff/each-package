@@ -16,10 +16,10 @@
   "license": "MIT",
   "main": "index.js",
   "bin": {
-    "ep": "./bin/each-package"
+    "ep": "./bin/each-package.js"
   },
   "scripts": {
-    "format": "eslint . --fix",
+    "format": "prettier --write .",
     "lint": "eslint .",
     "test": "mocha-compat test/spec/**/*.test.js  --no-timeouts"
   },
