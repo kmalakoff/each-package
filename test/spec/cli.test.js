@@ -39,7 +39,7 @@ describe('cli', function () {
   describe('unhappy path', function () {
     it('missing command', function (done) {
       spawn(CLI, ['--silent'], { stdout: 'string' }, function (err, res) {
-        assert.ok(!err);
+        assert.ok(!!err);
         done();
       });
     });
