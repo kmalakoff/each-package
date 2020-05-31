@@ -24,7 +24,7 @@
     "test": "mocha-compat test/spec/**/*.test.js  --no-timeouts"
   },
   "dependencies": {
-    "cross-spawn-cb": "^0.2.4",
+    "cross-spawn-cb": "^0.3.1",
     "fs-iterator": "^3.0.3",
     "getopts-compat": "^2.2.5",
     "object-assign": "^4.1.1"

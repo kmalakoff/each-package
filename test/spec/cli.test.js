@@ -11,7 +11,6 @@ describe('cli', function () {
     it('basic command', function (done) {
       spawn(CLI, ['--silent', 'npm', '--version'], { stdout: 'string' }, function (err, res) {
         assert.ok(!err);
-        assert.equal(res.code, 0);
         var lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0]));
         done();
@@ -21,7 +20,6 @@ describe('cli', function () {
     it('basic command with options', function (done) {
       spawn(CLI, ['--silent', 'node', '--version'], { stdout: 'string' }, function (err, res) {
         assert.ok(!err);
-        assert.equal(res.code, 0);
         var lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
         done();
@@ -31,7 +29,6 @@ describe('cli', function () {
     it('basic command with options (--)', function (done) {
       spawn(CLI, ['--silent', '--', 'node', '--version'], { stdout: 'string' }, function (err, res) {
         assert.ok(!err);
-        assert.equal(res.code, 0);
         var lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
         done();
@@ -43,7 +40,6 @@ describe('cli', function () {
     it('missing command', function (done) {
       spawn(CLI, ['--silent'], { stdout: 'string' }, function (err, res) {
         assert.ok(!err);
-        assert.ok(res.code !== 0);
         done();
       });
     });
