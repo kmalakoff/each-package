@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 var getopts = require('getopts-compat');
+var exit = require('exit');
+var path = require('path');
+var eachPackage = require('..');
 
 (function () {
   var options = getopts(process.argv.slice(2), {
@@ -16,11 +19,8 @@ var getopts = require('getopts-compat');
   var args = options._;
   if (!args.length) {
     console.log('Missing command. Example usage: each-package [command]');
-    return process.exit(-1);
+    return exit(-1);
   }
-
-  var path = require('path');
-  var eachPackage = require('..');
 
   if (!options.silent)
     options.header = function (entry, command, args) {
@@ -32,7 +32,7 @@ var getopts = require('getopts-compat');
   eachPackage(args[0], args.slice(1), options, function (err, results) {
     if (err) {
       console.log(err.message);
-      return process.exit(err.code || -1);
+      return exit(err.code || -1);
     }
     var errors = results.filter(function (result) {
       return !!result.error;
@@ -50,6 +50,6 @@ var getopts = require('getopts-compat');
       console.log('======================');
     }
 
-    process.exit(errors.length ? -1 : 0);
+    exit(errors.length ? -1 : 0);
   });
 })();
