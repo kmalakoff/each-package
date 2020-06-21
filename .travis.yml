@@ -6,5 +6,5 @@ os:
   - osx
   - windows
 script:
-  - npm install node-version-use -g
+  - npm install node-version-use -g -f
   - nvu engines npm test
