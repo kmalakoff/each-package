@@ -27,7 +27,7 @@
   "dependencies": {
     "cross-spawn-cb": "^0.3.1",
     "exit": "^0.1.2",
-    "fs-iterator": "^4.0.0",
+    "fs-iterator": "^4.0.1",
     "getopts-compat": "^2.2.5",
     "object-assign": "^4.1.1"
   },
