@@ -41,12 +41,12 @@ var eachPackage = require('..');
     if (!options.silent) {
       console.log('\n======================');
       if (errors.length) {
-        console.log('Errors (' + errors.length + ')');
+        console.log('Failed (' + errors.length + '). Passed (' + (results.length - errors.length) + ')');
         for (var index = 0; index < errors.length; index++) {
           var result = errors[index];
           console.log(result.path + ' Error: ' + result.error.message);
         }
-      } else console.log('Success (' + results.length + ')');
+      } else console.log('Passed (' + results.length + ')');
       console.log('======================');
     }
 
