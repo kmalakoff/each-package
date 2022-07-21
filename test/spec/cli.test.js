@@ -9,7 +9,7 @@ var CLI = path.join(__dirname, '..', '..', 'bin', 'each-package.js');
 describe('cli', function () {
   describe('happy path', function () {
     it('basic command', function (done) {
-      spawn(CLI, ['--silent', 'npm', '--version'], { stdout: 'string' }, function (err, res) {
+      spawn(CLI, ['--silent', 'npm', '--version'], { encoding: 'utf8' }, function (err, res) {
         assert.ok(!err);
         var lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0]));
@@ -18,7 +18,7 @@ describe('cli', function () {
     });
 
     it('basic command with options', function (done) {
-      spawn(CLI, ['--silent', 'node', '--version'], { stdout: 'string' }, function (err, res) {
+      spawn(CLI, ['--silent', 'node', '--version'], { encoding: 'utf8' }, function (err, res) {
         assert.ok(!err);
         var lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
@@ -27,7 +27,7 @@ describe('cli', function () {
     });
 
     it('basic command with options (--)', function (done) {
-      spawn(CLI, ['--silent', '--', 'node', '--version'], { stdout: 'string' }, function (err, res) {
+      spawn(CLI, ['--silent', '--', 'node', '--version'], { encoding: 'utf8' }, function (err, res) {
         assert.ok(!err);
         var lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
@@ -38,7 +38,7 @@ describe('cli', function () {
 
   describe('unhappy path', function () {
     it('missing command', function (done) {
-      spawn(CLI, ['--silent'], { stdout: 'string' }, function (err, res) {
+      spawn(CLI, ['--silent'], { encoding: 'utf8' }, function (err, res) {
         assert.ok(!!err);
         done();
       });
