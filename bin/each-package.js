@@ -29,6 +29,7 @@ var eachPackage = require('..');
       console.log('----------------------');
     };
 
+  options.stdio = 'inherit'
   eachPackage(args[0], args.slice(1), options, function (err, results) {
     if (err) {
       console.log(err.message);
