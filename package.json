@@ -15,37 +15,37 @@
   },
   "license": "MIT",
   "main": "lib/index.js",
-  "files": [
-    "lib"
-  ],
   "bin": {
     "ep": "./bin/each-package.js"
   },
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint .",
-    "prepublishOnly": "dtd \"npm run lint\" \"depcheck\"",
-    "test": "mocha-compat test/spec/**/*.test.js  --no-timeouts"
+    "prepublishOnly": "npm run lint && depcheck",
+    "test": "mocha-compat test/spec/**/*.test.js  --no-timeouts",
+    "test:engines": "nvu engines npm test"
   },
   "dependencies": {
-    "cross-spawn-cb": "^0.5.9",
+    "cross-spawn-cb": "^0.6.5",
     "exit": "^0.1.2",
     "fs-iterator": "^4.1.1",
     "getopts-compat": "^2.2.5",
     "just-extend": "^6.0.1"
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.7",
     "cr": "^0.1.0",
     "depcheck": "^1.4.3",
-    "dis-dat": "^0.1.7",
-    "eslint": "^8.18.0",
+    "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^15.2.3",
+    "eslint-plugin-n": "^15.2.4",
     "eslint-plugin-promise": "^6.0.0",
-    "is-version": "^0.2.0",
+    "is-version": "^0.2.1",
     "mocha-compat": "^3.5.5",
     "prettier": "^2.7.1"
   },
