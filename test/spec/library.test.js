@@ -14,8 +14,6 @@ describe('library', function () {
       });
     });
     it('basic command (promises)', function (done) {
-      if (typeof Promise === 'undefined') return;
-
       eachPackage('node', ['--version'], { silent: true, encoding: 'utf8' })
         .then(function (results) {
           assert.ok(isVersion(cr(results[0].result.stdout).split('\n').slice(-2, -1)[0], 'v'));

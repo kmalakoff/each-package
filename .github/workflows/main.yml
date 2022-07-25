@@ -12,13 +12,13 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3.4.1
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - run: git config --global user.name "Github Actions"
       - run: git config --global user.email "actions@users.noreply.github.com"
       - run: npm install node-version-use -g
       - run: npm ci
-      - run: npx playwright install --with-deps
       - run: npm run lint
+      - run: npm run build
       - run: npm run test:engines
