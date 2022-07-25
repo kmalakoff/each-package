@@ -9,10 +9,10 @@ var CLI = path.join(__dirname, '..', '..', 'bin', 'each-package.js');
 describe('cli', function () {
   describe('happy path', function () {
     it('basic command', function (done) {
-      spawn(CLI, ['--silent', 'npm', '--version'], { encoding: 'utf8' }, function (err, res) {
+      spawn(CLI, ['--silent', 'echo', '"hello"'], { encoding: 'utf8' }, function (err, res) {
         assert.ok(!err);
         var lines = cr(res.stdout).split('\n');
-        assert.ok(isVersion(lines.slice(-2, -1)[0]));
+        assert.equal(lines.slice(-2, -1)[0], '"hello"');
         done();
       });
     });
