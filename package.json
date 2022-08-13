@@ -30,15 +30,15 @@
     "test:engines": "nvu engines npm test"
   },
   "dependencies": {
+    "core-js": "^3.24.1",
     "cross-spawn-cb": "^0.6.14",
-    "es6-promise": "^4.2.8",
     "exit": "^0.1.2",
     "fs-iterator": "^4.1.1",
     "getopts-compat": "^2.2.5",
-    "just-extend": "^6.0.1"
+    "just-extend": "^6.1.1"
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "^5.32.0",
+    "@typescript-eslint/parser": "^5.33.0",
     "cr": "^0.1.0",
     "depcheck": "^1.4.3",
     "eslint": "^8.21.0",
