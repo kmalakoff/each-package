@@ -3,11 +3,12 @@ const Iterator = require('fs-iterator');
 const assign = require('just-extend');
 const spawn = require('cross-spawn-cb');
 
-const ignores = ['.git', 'node_modules', '.yarn'];
+const defaultIgnores = ['.git', 'node_modules', '.yarn'];
 
 module.exports = function each(command, args, options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
+  const ignores = options.ignore ? options.ignore.split(',') : defaultIgnores;
 
   const iterator = new Iterator(process.cwd(), {
     filter: function filter(entry) {
