@@ -22,24 +22,26 @@ module.exports = function each(command, args, options, callback) {
   iterator.forEach(
     (entry, callback) => {
       if (!entry.stats.isFile()) return callback();
-      !options.header || options.header(entry, command, args);
 
       const spawnOptions = { ...options, cwd: path.dirname(entry.fullPath) };
       if (concurrency > 1 && inherit) {
         spawnOptions.encoding = 'utf8';
         if (spawnOptions.stdout === 'inherit') spawnOptions.stdout = undefined;
         if (spawnOptions.stdio === 'inherit') spawnOptions.stdio = undefined;
+      } else {
+        !options.header || options.header(entry, command, args);
       }
 
       const cp = spawn(command, args, spawnOptions);
       crossSpawn.normalize(cp, spawnOptions, (err, res) => {
         results.push({ path: entry.path, error: err, result: res });
-        if (res && concurrency > 1 && inherit) {
-          if (typeof res.stdout === 'string') {
+        if (concurrency > 1 && inherit) {
+          !options.header || options.header(entry, command, args);
+          if (res && typeof res.stdout === 'string') {
             process.stdout.write(res.stdout);
             res.stdout = null;
           }
-          if (typeof res.stderr === 'string') {
+          if (res && typeof res.stderr === 'string') {
             process.stderr.write(res.stderr);
             res.stderr = null;
           }
