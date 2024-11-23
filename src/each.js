@@ -3,6 +3,17 @@ const Iterator = require('fs-iterator');
 const crossSpawn = require('cross-spawn-cb');
 const spawn = crossSpawn.spawn;
 
+function pipe(res, clear) {
+  if (res && typeof res.stdout === 'string') {
+    process.stdout.write(res.stdout);
+    if (clear) res.stdout = null;
+  }
+  if (res && typeof res.stderr === 'string') {
+    process.stderr.write(res.stderr);
+    if (clear) res.stderr = null;
+  }
+}
+
 module.exports = function each(command, args, options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
@@ -37,14 +48,7 @@ module.exports = function each(command, args, options, callback) {
         results.push({ path: entry.path, error: err, result: res });
         if (concurrency > 1 && inherit) {
           !options.header || options.header(entry, command, args);
-          if (res && typeof res.stdout === 'string') {
-            process.stdout.write(res.stdout);
-            res.stdout = null;
-          }
-          if (res && typeof res.stderr === 'string') {
-            process.stderr.write(res.stderr);
-            res.stderr = null;
-          }
+          res ? pipe(res, true) : pipe(err, false);
         }
         callback();
       });
