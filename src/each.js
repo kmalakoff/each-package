@@ -34,7 +34,7 @@ module.exports = function each(command, args, options, callback) {
       const cp = spawn(command, args, spawnOptions);
       crossSpawn.normalize(cp, spawnOptions, (err, res) => {
         results.push({ path: entry.path, error: err, result: res });
-        if (concurrency > 1 && inherit) {
+        if (res && concurrency > 1 && inherit) {
           if (typeof res.stdout === 'string') {
             process.stdout.write(res.stdout);
             res.stdout = null;

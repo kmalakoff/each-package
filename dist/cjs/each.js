@@ -87,7 +87,7 @@ module.exports = function each(command, args, options, callback) {
                 error: err,
                 result: res
             });
-            if (concurrency > 1 && inherit) {
+            if (res && concurrency > 1 && inherit) {
                 if (typeof res.stdout === "string") {
                     process.stdout.write(res.stdout);
                     res.stdout = null;
