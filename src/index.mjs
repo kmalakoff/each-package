@@ -1,7 +1,7 @@
-require('./polyfills');
-var each = require('./each');
+import './polyfills.cjs';
+import each from './each';
 
-module.exports = function eachPackage(command, args, options, callback) {
+export default function eachPackage(command, args, options, callback) {
   if (typeof options === 'function') {
     callback = options;
     options = {};
@@ -9,9 +9,9 @@ module.exports = function eachPackage(command, args, options, callback) {
   options = options || {};
 
   if (typeof callback === 'function') return each(command, args, options, callback);
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     each(command, args, options, function eachCallback(err, result) {
       err ? reject(err) : resolve(result);
     });
   });
-};
+}
