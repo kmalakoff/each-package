@@ -1,44 +1,48 @@
-var assert = require('assert');
-var path = require('path');
-var spawn = require('cross-spawn-cb');
-var isVersion = require('is-version');
-var cr = require('cr');
+// remove NODE_OPTIONS from ts-dev-stack
+// biome-ignore lint/performance/noDelete: <explanation>
+delete process.env.NODE_OPTIONS;
 
-var CLI = path.join(__dirname, '..', '..', 'bin', 'each-package.js');
+const assert = require('assert');
+const path = require('path');
+const spawn = require('cross-spawn-cb');
+const isVersion = require('is-version');
+const cr = require('cr');
 
-describe('cli', function () {
-  describe('happy path', function () {
-    it('basic command', function (done) {
-      spawn(CLI, ['--silent', 'echo', '"hello"'], { encoding: 'utf8' }, function (err, res) {
+const CLI = path.join(__dirname, '..', '..', 'bin', 'cli.js');
+
+describe('cli', () => {
+  describe('happy path', () => {
+    it('basic command', (done) => {
+      spawn(CLI, ['--silent', 'echo', '"hello"'], { encoding: 'utf8' }, (err, res) => {
         assert.ok(!err);
-        var lines = cr(res.stdout).split('\n');
+        const lines = cr(res.stdout).split('\n');
         assert.equal(lines.slice(-2, -1)[0], '"hello"');
         done();
       });
     });
 
-    it('basic command with options', function (done) {
-      spawn(CLI, ['--silent', 'node', '--version'], { encoding: 'utf8' }, function (err, res) {
+    it('basic command with options', (done) => {
+      spawn(CLI, ['--silent', 'node', '--version'], { encoding: 'utf8' }, (err, res) => {
         assert.ok(!err);
-        var lines = cr(res.stdout).split('\n');
+        const lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
         done();
       });
     });
 
-    it('basic command with options (--)', function (done) {
-      spawn(CLI, ['--silent', '--', 'node', '--version'], { encoding: 'utf8' }, function (err, res) {
+    it('basic command with options (--)', (done) => {
+      spawn(CLI, ['--silent', '--', 'node', '--version'], { encoding: 'utf8' }, (err, res) => {
         assert.ok(!err);
-        var lines = cr(res.stdout).split('\n');
+        const lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
         done();
       });
     });
   });
 
-  describe('unhappy path', function () {
-    it('missing command', function (done) {
-      spawn(CLI, ['--silent'], { encoding: 'utf8' }, function (err, res) {
+  describe('unhappy path', () => {
+    it('missing command', (done) => {
+      spawn(CLI, ['--silent'], { encoding: 'utf8' }, (err, _res) => {
         assert.ok(!!err);
         done();
       });
