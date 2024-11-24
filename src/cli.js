@@ -22,7 +22,7 @@ export default (argv) => {
   if (!options.silent)
     options.header = (entry, command, args) => {
       console.log('\n----------------------');
-      console.log(`${[command].concat(args).join(' ')} (${path.dirname(entry.path)})`);
+      console.log(`${path.dirname(entry.path)}:\n\n${[command].concat(args).join(' ')}`);
       console.log('----------------------');
     };
 

@@ -41,9 +41,9 @@ var _default = function(argv) {
     }
     if (!options.silent) options.header = function(entry, command, args) {
         console.log('\n----------------------');
-        console.log("".concat([
+        console.log("".concat(_path.default.dirname(entry.path), ":\n\n").concat([
             command
-        ].concat(args).join(' '), " (").concat(_path.default.dirname(entry.path), ")"));
+        ].concat(args).join(' ')));
         console.log('----------------------');
     };
     options.stdio = 'inherit';

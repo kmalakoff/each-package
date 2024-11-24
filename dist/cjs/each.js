@@ -60,7 +60,7 @@ var once = require('call-once-fn');
 var throttle = require('lodash.throttle');
 var crossSpawn = require('cross-spawn-cb');
 var spawn = crossSpawn.spawn;
-var THROTTLE_DURATION = 30000; // 30 sec
+var THROTTLE_DURATION = 20000; // 20 sec
 module.exports = function each(command, args, options, callback) {
     var depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
     if (depth !== Infinity) depth++; // depth is relative to first level of packages
