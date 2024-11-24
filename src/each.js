@@ -8,7 +8,7 @@ const throttle = require('lodash.throttle');
 const crossSpawn = require('cross-spawn-cb');
 const spawn = crossSpawn.spawn;
 
-const THROTTLE_DURATION = 30000; // 30 sec
+const THROTTLE_DURATION = 20000; // 20 sec
 
 module.exports = function each(command, args, options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
