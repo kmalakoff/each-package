@@ -16,12 +16,12 @@ function _interop_require_default(obj) {
     };
 }
 function eachPackage(command, args, options, callback) {
-    if (typeof options === "function") {
+    if (typeof options === 'function') {
         callback = options;
         options = {};
     }
     options = options || {};
-    if (typeof callback === "function") return (0, _each.default)(command, args, options, callback);
+    if (typeof callback === 'function') return (0, _each.default)(command, args, options, callback);
     return new Promise(function(resolve, reject) {
         (0, _each.default)(command, args, options, function eachCallback(err, result) {
             err ? reject(err) : resolve(result);

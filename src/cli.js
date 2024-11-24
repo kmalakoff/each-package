@@ -40,7 +40,7 @@ export default (argv) => {
         console.log(`Failed (${errors.length}). Passed (${results.length - errors.length})`);
         for (let index = 0; index < errors.length; index++) {
           const result = errors[index];
-          console.log(`${result.path} Error: ${result.error.message}`);
+          console.log(`${path.dirname(result.path)} Error: ${result.error.message}`);
         }
       } else console.log(`Passed (${results.length})`);
       console.log('======================');
