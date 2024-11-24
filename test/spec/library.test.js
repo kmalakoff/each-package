@@ -19,8 +19,8 @@ describe('library', () => {
         done();
       });
     });
-    it('basic command (limit 10)', (done) => {
-      eachPackage('node', ['--version'], { silent: true, encoding: 'utf8', concurrency: 100, cwd: NODE_MODULES }, (err, results) => {
+    it('basic command (concurrency 10)', (done) => {
+      eachPackage('node', ['--version'], { silent: true, encoding: 'utf8', concurrency: 10, cwd: NODE_MODULES }, (err, results) => {
         assert.ok(!err);
         assert.ok(isVersion(cr(results[0].result.stdout).split('\n').slice(-2, -1)[0], 'v'));
         done();
