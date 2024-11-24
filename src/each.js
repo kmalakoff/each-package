@@ -1,18 +1,14 @@
 const path = require('path');
 const Iterator = require('fs-iterator');
+const Queue = require('queue-cb');
+const Console = require('foreman/lib/console.js');
+const Colors = require('foreman/lib/colors.js');
+const once = require('call-once-fn');
+const throttle = require('lodash.throttle');
 const crossSpawn = require('cross-spawn-cb');
 const spawn = crossSpawn.spawn;
 
-function pipe(res, clear) {
-  if (res && typeof res.stdout === 'string') {
-    process.stdout.write(res.stdout);
-    if (clear) res.stdout = null;
-  }
-  if (res && typeof res.stderr === 'string') {
-    process.stderr.write(res.stderr);
-    if (clear) res.stderr = null;
-  }
-}
+const THROTTLE_DURATION = 20000; // 20 sec
 
 module.exports = function each(command, args, options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
@@ -20,6 +16,7 @@ module.exports = function each(command, args, options, callback) {
   const concurrency = typeof options.concurrency === 'undefined' ? 1 : options.concurrency;
   const cwd = typeof options.cwd === 'undefined' ? process.cwd() : options.cwd;
   const inherit = options.stdout === 'inherit' || options.stdio === 'inherit';
+  const throttleDuration = typeof options.throttleDuration === 'undefined' ? THROTTLE_DURATION : options.throttleDuration;
 
   const iterator = new Iterator(cwd, {
     filter: function filter(entry) {
@@ -30,30 +27,67 @@ module.exports = function each(command, args, options, callback) {
   });
 
   const results = [];
+  let processed = 0;
   iterator.forEach(
     (entry, callback) => {
       if (!entry.stats.isFile()) return callback();
 
       const spawnOptions = { ...options, cwd: path.dirname(entry.fullPath) };
-      if (concurrency > 1 && inherit) {
+
+      if (!inherit || concurrency < 2) {
+        const cp = spawn(command, args, spawnOptions);
+
+        !options.header || options.header(entry, command, args);
+        crossSpawn.normalize(cp, spawnOptions, (err, res) => {
+          results.push({ path: entry.path, error: err, result: res });
+          callback();
+        });
+      } else {
         spawnOptions.encoding = 'utf8';
         if (spawnOptions.stdout === 'inherit') spawnOptions.stdout = undefined;
         if (spawnOptions.stdio === 'inherit') spawnOptions.stdio = undefined;
-      } else {
-        !options.header || options.header(entry, command, args);
-      }
+        const cp = spawn(command, args, spawnOptions);
 
-      const cp = spawn(command, args, spawnOptions);
-      crossSpawn.normalize(cp, spawnOptions, (err, res) => {
-        results.push({ path: entry.path, error: err, result: res });
-        if (concurrency > 1 && inherit) {
+        const queue = new Queue();
+        const cons = new Console();
+        const color = Colors.colors[processed++];
+        const chunks = [];
+        function write() {
+          if (!chunks.length) return;
           !options.header || options.header(entry, command, args);
-          res ? pipe(res, true) : pipe(err, false);
+          cons.log(entry.path, { color }, Buffer.concat(chunks.splice(0)).toString('utf8'));
         }
-        callback();
-      });
+        const writeThrottled = throttle(write, throttleDuration);
+        function collect(stream, cb) {
+          cb = once(cb);
+          stream.on('data', (chunk) => {
+            chunks.push(chunk);
+            writeThrottled();
+          });
+          stream.once('end', cb);
+          stream.once('error', cb);
+        }
+
+        !cp.stdout || queue.defer((cb) => collect(cp.stdout, cb));
+        !cp.stderr || queue.defer((cb) => collect(cp.stderr, cb));
+
+        queue.defer((cb) => {
+          crossSpawn.normalize(cp, spawnOptions, (err, res) => {
+            if (res && res.stdout) res.stdout = null;
+            if (res && res.stderr) res.stderr = null;
+            if (res && res.output) res.output[1] = null;
+            if (res && res.output) res.output[2] = null;
+            results.push({ path: entry.path, error: err, result: res });
+            cb();
+          });
+        });
+        queue.await((err) => {
+          write();
+          callback(err);
+        });
+      }
     },
-    { callbacks: true, concurrency: concurrency },
+    { callbacks: true, concurrency },
     function iteratorCallback(err) {
       err ? callback(err) : callback(null, results);
     }
