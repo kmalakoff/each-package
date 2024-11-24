@@ -8,7 +8,7 @@ const throttle = require('lodash.throttle');
 const crossSpawn = require('cross-spawn-cb');
 const spawn = crossSpawn.spawn;
 
-const THROTTLE_DURATION = 20000; // 20 sec
+const THROTTLE_DURATION = 30000; // 30 sec
 
 module.exports = function each(command, args, options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
@@ -50,12 +50,15 @@ module.exports = function each(command, args, options, callback) {
 
         const queue = new Queue();
         const cons = new Console();
-        const color = Colors.colors[processed++];
+        cons.padding = 0;
+        cons.trimline = 0;
+        cons.wrapline = 0;
+        const color = Colors.colors[processed++ % Colors.colors_max];
         const chunks = [];
         function write() {
           if (!chunks.length) return;
           !options.header || options.header(entry, command, args);
-          cons.log(entry.path, { color }, Buffer.concat(chunks.splice(0)).toString('utf8'));
+          cons.log('', { color }, Buffer.concat(chunks.splice(0)).toString('utf8'));
         }
         const writeThrottled = throttle(write, throttleDuration);
         function collect(stream, cb) {

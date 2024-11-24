@@ -60,7 +60,7 @@ var once = require('call-once-fn');
 var throttle = require('lodash.throttle');
 var crossSpawn = require('cross-spawn-cb');
 var spawn = crossSpawn.spawn;
-var THROTTLE_DURATION = 20000; // 20 sec
+var THROTTLE_DURATION = 30000; // 30 sec
 module.exports = function each(command, args, options, callback) {
     var depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
     if (depth !== Infinity) depth++; // depth is relative to first level of packages
@@ -97,7 +97,7 @@ module.exports = function each(command, args, options, callback) {
             var write = function write() {
                 if (!chunks.length) return;
                 !options.header || options.header(entry, command, args);
-                cons.log(entry.path, {
+                cons.log('', {
                     color: color
                 }, Buffer.concat(chunks.splice(0)).toString('utf8'));
             };
@@ -116,7 +116,10 @@ module.exports = function each(command, args, options, callback) {
             var cp1 = spawn(command, args, spawnOptions);
             var queue = new Queue();
             var cons = new Console();
-            var color = Colors.colors[processed++];
+            cons.padding = 0;
+            cons.trimline = 0;
+            cons.wrapline = 0;
+            var color = Colors.colors[processed++ % Colors.colors_max];
             var chunks = [];
             var writeThrottled = throttle(write, throttleDuration);
             !cp1.stdout || queue.defer(function(cb) {
