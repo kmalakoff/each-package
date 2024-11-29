@@ -33,7 +33,7 @@
   "dependencies": {
     "call-once-fn": "^1.0.1",
     "core-js": "^3.39.0",
-    "cross-spawn-cb": "^1.0.0",
+    "cross-spawn-cb": "^1.1.0",
     "exit": "^0.1.2",
     "foreman": "^3.0.1",
     "fs-iterator": "^5.1.0",
@@ -44,10 +44,10 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.9.3",
+    "@types/node": "^22.10.1",
     "cr": "^0.1.0",
     "is-version": "^0.2.1",
-    "ts-dev-stack": "^0.16.0"
+    "ts-dev-stack": "^0.16.3"
   },
   "engines": {
     "node": ">=0.8"
