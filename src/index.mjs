@@ -1,4 +1,3 @@
-import './polyfills.cjs';
 import each from './each';
 
 export default function eachPackage(command, args, options, callback) {
