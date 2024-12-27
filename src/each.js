@@ -38,14 +38,14 @@ module.exports = function each(command, args, options, callback) {
         const cp = spawn(command, args, spawnOptions);
 
         !options.header || options.header(entry, command, args);
-        crossSpawn.normalize(cp, spawnOptions, (err, res) => {
+        crossSpawn.worker(cp, spawnOptions, (err, res) => {
           results.push({ path: entry.path, error: err, result: res });
           callback();
         });
       } else {
         spawnOptions.encoding = 'utf8';
-        if (spawnOptions.stdout === 'inherit') spawnOptions.stdout = undefined;
-        if (spawnOptions.stdio === 'inherit') spawnOptions.stdio = undefined;
+        if (spawnOptions.stdout === 'inherit') delete spawnOptions.stdout;
+        if (spawnOptions.stdio === 'inherit') delete spawnOptions.stdio;
         const cp = spawn(command, args, spawnOptions);
 
         const queue = new Queue();
@@ -75,7 +75,7 @@ module.exports = function each(command, args, options, callback) {
         !cp.stderr || queue.defer((cb) => collect(cp.stderr, cb));
 
         queue.defer((cb) => {
-          crossSpawn.normalize(cp, spawnOptions, (err, res) => {
+          crossSpawn.worker(cp, spawnOptions, (err, res) => {
             if (res && res.stdout) res.stdout = null;
             if (res && res.stderr) res.stderr = null;
             if (res && res.output) res.output[1] = null;

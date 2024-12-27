@@ -1,6 +1,8 @@
 // remove NODE_OPTIONS from ts-dev-stack
-// biome-ignore lint/performance/noDelete: <explanation>
 delete process.env.NODE_OPTIONS;
+
+// biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
+const Promise = require('pinkie-promise');
 
 const assert = require('assert');
 const path = require('path');
@@ -11,6 +13,16 @@ const eachPackage = require('each-package');
 const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules', '@biomejs');
 
 describe('library', () => {
+  const root = typeof global !== 'undefined' ? global : window;
+  let rootPromise;
+  before(() => {
+    rootPromise = root.Promise;
+    root.Promise = Promise;
+  });
+  after(() => {
+    root.Promise = rootPromise;
+  });
+
   describe('happy path', () => {
     it('basic command', (done) => {
       eachPackage('node', ['--version'], { silent: true, encoding: 'utf8' }, (err, results) => {
@@ -26,15 +38,9 @@ describe('library', () => {
         done();
       });
     });
-    it('basic command (promises)', (done) => {
-      eachPackage('node', ['--version'], { silent: true, encoding: 'utf8' })
-        .then((results) => {
-          assert.ok(isVersion(cr(results[0].result.stdout).split('\n').slice(-2, -1)[0], 'v'));
-          done();
-        })
-        .catch((err) => {
-          assert.ok(!err, err ? err.message : '');
-        });
+    it('basic command (promises)', async () => {
+      const results = await eachPackage('node', ['--version'], { silent: true, encoding: 'utf8' });
+      assert.ok(isVersion(cr(results[0].result.stdout).split('\n').slice(-2, -1)[0], 'v'));
     });
   });
 });
