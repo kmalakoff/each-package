@@ -1,27 +1,29 @@
-// remove NODE_OPTIONS from ts-dev-stack
-delete process.env.NODE_OPTIONS;
+import assert from 'assert';
+import path from 'path';
+import url from 'url';
+import cr from 'cr';
+import isVersion from 'is-version';
+import Pinkie from 'pinkie-promise';
 
-// biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
-const Promise = require('pinkie-promise');
-
-const assert = require('assert');
-const path = require('path');
-const isVersion = require('is-version');
-const cr = require('cr');
-
-const eachPackage = require('each-package');
+// @ts-ignore
+import eachPackage from 'each-package';
+const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules', '@biomejs');
 
 describe('library', () => {
-  const root = typeof global !== 'undefined' ? global : window;
-  let rootPromise;
-  before(() => {
-    rootPromise = root.Promise;
-    root.Promise = Promise;
-  });
-  after(() => {
-    root.Promise = rootPromise;
-  });
+  (() => {
+    // patch and restore promise
+    // @ts-ignore
+    let rootPromise: Promise;
+    before(() => {
+      rootPromise = global.Promise;
+      // @ts-ignore
+      global.Promise = Pinkie;
+    });
+    after(() => {
+      global.Promise = rootPromise;
+    });
+  })();
 
   describe('happy path', () => {
     it('basic command', (done) => {
