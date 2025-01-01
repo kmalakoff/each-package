@@ -3,7 +3,7 @@
 import path from 'path';
 import exit from 'exit';
 import getopts from 'getopts-compat';
-import eachPackage from './index.mjs';
+import eachPackage from './index';
 
 export default (argv) => {
   const options = getopts(argv, {

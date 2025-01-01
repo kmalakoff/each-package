@@ -1,16 +1,15 @@
-const path = require('path');
-const Iterator = require('fs-iterator');
-const Queue = require('queue-cb');
-const Console = require('foreman/lib/console.js');
-const Colors = require('foreman/lib/colors.js');
-const once = require('call-once-fn');
-const throttle = require('lodash.throttle');
-const crossSpawn = require('cross-spawn-cb');
-const spawn = crossSpawn.spawn;
+import path from 'path';
+import once from 'call-once-fn';
+import spawn, { crossSpawn } from 'cross-spawn-cb';
+import Colors from 'foreman/lib/colors.js';
+import Console from 'foreman/lib/console.js';
+import Iterator from 'fs-iterator';
+import throttle from 'lodash.throttle';
+import Queue from 'queue-cb';
 
 const THROTTLE_DURATION = 20000; // 20 sec
 
-module.exports = function each(command, args, options, callback) {
+export default function each(command, args, options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const concurrency = typeof options.concurrency === 'undefined' ? 1 : options.concurrency;
@@ -35,10 +34,10 @@ module.exports = function each(command, args, options, callback) {
       const spawnOptions = { ...options, cwd: path.dirname(entry.fullPath) };
 
       if (!inherit || concurrency < 2) {
-        const cp = spawn(command, args, spawnOptions);
+        const cp = crossSpawn(command, args, spawnOptions);
 
         !options.header || options.header(entry, command, args);
-        crossSpawn.worker(cp, spawnOptions, (err, res) => {
+        spawn.worker(cp, spawnOptions, (err, res) => {
           results.push({ path: entry.path, error: err, result: res });
           callback();
         });
@@ -46,7 +45,7 @@ module.exports = function each(command, args, options, callback) {
         spawnOptions.encoding = 'utf8';
         if (spawnOptions.stdout === 'inherit') delete spawnOptions.stdout;
         if (spawnOptions.stdio === 'inherit') delete spawnOptions.stdio;
-        const cp = spawn(command, args, spawnOptions);
+        const cp = crossSpawn(command, args, spawnOptions);
 
         const queue = new Queue();
         const cons = new Console();
@@ -75,7 +74,7 @@ module.exports = function each(command, args, options, callback) {
         !cp.stderr || queue.defer((cb) => collect(cp.stderr, cb));
 
         queue.defer((cb) => {
-          crossSpawn.worker(cp, spawnOptions, (err, res) => {
+          spawn.worker(cp, spawnOptions, (err, res) => {
             if (res && res.stdout) res.stdout = null;
             if (res && res.stderr) res.stderr = null;
             if (res && res.output) res.output[1] = null;
@@ -95,4 +94,4 @@ module.exports = function each(command, args, options, callback) {
       err ? callback(err) : callback(null, results);
     }
   );
-};
+}
