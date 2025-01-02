@@ -27,7 +27,7 @@
   "module": "dist/dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "bin": {
-    "ep": "./bin/cli.js"
+    "ep": "./bin/cli.cjs"
   },
   "files": [
     "dist"
