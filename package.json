@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:kmalakoff/each-package.git"
+    "url": "git+ssh://git@github.com/kmalakoff/each-package.git"
   },
   "license": "MIT",
   "type": "module",
@@ -42,14 +42,14 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "call-once-fn": "^1.0.1",
-    "cross-spawn-cb": "^2.0.4",
+    "call-once-fn": "^1.0.4",
+    "cross-spawn-cb": "^2.0.6",
     "exit": "^0.1.2",
     "foreman": "^3.0.1",
-    "fs-iterator": "^5.2.1",
+    "fs-iterator": "^5.2.3",
     "getopts-compat": "^2.2.5",
     "lodash.throttle": "^4.1.1",
-    "queue-cb": "^1.4.4"
+    "queue-cb": "^1.4.7"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
