@@ -43,10 +43,10 @@
   },
   "dependencies": {
     "call-once-fn": "^1.0.5",
-    "cross-spawn-cb": "^2.0.11",
+    "cross-spawn-cb": "^2.0.12",
     "exit": "^0.1.2",
     "foreman": "^3.0.1",
-    "fs-iterator": "^5.2.8",
+    "fs-iterator": "^5.2.10",
     "getopts-compat": "^2.2.5",
     "lodash.throttle": "^4.1.1",
     "queue-cb": "^1.4.9"
