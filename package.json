@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "call-once-fn": "^1.0.5",
-    "cross-spawn-cb": "^2.0.12",
+    "cross-spawn-cb": "^2.0.13",
     "exit": "^0.1.2",
     "foreman": "^3.0.1",
     "fs-iterator": "^5.2.10",
