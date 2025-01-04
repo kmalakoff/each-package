@@ -43,13 +43,13 @@
   },
   "dependencies": {
     "call-once-fn": "^1.0.4",
-    "cross-spawn-cb": "^2.0.6",
+    "cross-spawn-cb": "^2.0.9",
     "exit": "^0.1.2",
     "foreman": "^3.0.1",
-    "fs-iterator": "^5.2.3",
+    "fs-iterator": "^5.2.6",
     "getopts-compat": "^2.2.5",
     "lodash.throttle": "^4.1.1",
-    "queue-cb": "^1.4.7"
+    "queue-cb": "^1.4.8"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
