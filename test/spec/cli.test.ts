@@ -12,7 +12,7 @@ describe('cli', () => {
   describe('happy path', () => {
     it('basic command', (done) => {
       spawn(CLI, ['--silent', 'echo', '"hello"'], { encoding: 'utf8' }, (err, res) => {
-        assert.ok(!err, err ? err.message : '');
+        if (err) return done(err);
         const lines = cr(res.stdout).split('\n');
         assert.equal(lines.slice(-2, -1)[0], '"hello"');
         done();
@@ -21,7 +21,7 @@ describe('cli', () => {
 
     it('basic command with options', (done) => {
       spawn(CLI, ['--silent', 'node', '--version'], { encoding: 'utf8' }, (err, res) => {
-        assert.ok(!err, err ? err.message : '');
+        if (err) return done(err);
         const lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
         done();
@@ -30,7 +30,7 @@ describe('cli', () => {
 
     it('basic command with options (--)', (done) => {
       spawn(CLI, ['--silent', '--', 'node', '--version'], { encoding: 'utf8' }, (err, res) => {
-        assert.ok(!err, err ? err.message : '');
+        if (err) return done(err);
         const lines = cr(res.stdout).split('\n');
         assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
         done();
