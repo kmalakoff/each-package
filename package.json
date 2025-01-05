@@ -45,7 +45,6 @@
     "call-once-fn": "^1.0.6",
     "cross-spawn-cb": "^2.0.13",
     "exit": "^0.1.2",
-    "figures": "^6.1.0",
     "foreman": "^3.0.1",
     "fs-iterator": "^5.2.10",
     "getopts-compat": "^2.2.5",
