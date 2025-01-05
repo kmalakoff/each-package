@@ -1,6 +1,6 @@
 import path from 'path';
 import once from 'call-once-fn';
-import spawn, { crossSpawn } from 'cross-spawn-cb';
+import spawn, { crossSpawn, type SpawnResult } from 'cross-spawn-cb';
 import Colors from 'foreman/lib/colors.js';
 import Console from 'foreman/lib/console.js';
 import Iterator from 'fs-iterator';
@@ -37,7 +37,11 @@ export default function each(command, args, options, callback) {
         const cp = crossSpawn(command, args, spawnOptions);
 
         !options.header || options.header(entry, command, args);
-        spawn.worker(cp, spawnOptions, (err, res) => {
+        spawn.worker(cp, spawnOptions, (err: Error, res) => {
+          if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
+            res = err as unknown as SpawnResult;
+            err = null;
+          }
           results.push({ path: path.dirname(entry.path), error: err, result: res });
           callback();
         });
@@ -75,6 +79,11 @@ export default function each(command, args, options, callback) {
 
         queue.defer((cb) => {
           spawn.worker(cp, spawnOptions, (err, res) => {
+            if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
+              res = err as unknown as SpawnResult;
+              err = null;
+            }
+
             if (res && res.stdout) res.stdout = null;
             if (res && res.stderr) res.stderr = null;
             if (res && res.output) res.output[1] = null;

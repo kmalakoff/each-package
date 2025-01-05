@@ -34,8 +34,6 @@
   ],
   "scripts": {
     "build": "tsds build",
-    "deploy": "tsds deploy",
-    "docs": "tsds docs",
     "format": "biome check --write --unsafe src/ test/",
     "test": "tsds test:node --no-timeouts",
     "test:engines": "nvu engines npm test",
@@ -43,7 +41,7 @@
   },
   "dependencies": {
     "call-once-fn": "^1.0.6",
-    "cross-spawn-cb": "^2.0.13",
+    "cross-spawn-cb": "^2.1.0",
     "exit": "^0.1.2",
     "foreman": "^3.0.1",
     "fs-iterator": "^5.2.10",
