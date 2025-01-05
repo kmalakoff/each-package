@@ -38,7 +38,7 @@ export default function each(command, args, options, callback) {
 
         !options.header || options.header(entry, command, args);
         spawn.worker(cp, spawnOptions, (err, res) => {
-          results.push({ path: entry.path, error: err, result: res });
+          results.push({ path: path.dirname(entry.path), error: err, result: res });
           callback();
         });
       } else {
@@ -79,7 +79,7 @@ export default function each(command, args, options, callback) {
             if (res && res.stderr) res.stderr = null;
             if (res && res.output) res.output[1] = null;
             if (res && res.output) res.output[2] = null;
-            results.push({ path: entry.path, error: err, result: res });
+            results.push({ path: path.dirname(entry.path), error: err, result: res });
             cb();
           });
         });

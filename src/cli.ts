@@ -37,8 +37,8 @@ export default (argv) => {
 
     if (!options.silent) {
       console.log('\n======================');
-      console.log(`nvu ${args.join(' ')} ${errors.length ? 'failed' : 'succeeed'}`);
-      results.forEach((res) => console.log(`${res.error ? figures.cross : figures.tick} ${res.version}${res.error ? ` Error: ${res.error.message}` : ''}`));
+      console.log(`nvu ${args.join(' ')} ${errors.length ? 'failed' : 'succeeded'}`);
+      results.forEach((res) => console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`));
     }
 
     exit(errors.length ? -1 : 0);
