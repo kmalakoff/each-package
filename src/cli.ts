@@ -2,9 +2,13 @@
 
 import path from 'path';
 import exit from 'exit';
-import figures from 'figures';
 import getopts from 'getopts-compat';
 import eachPackage from './index';
+
+const figures = {
+  tick: '✔',
+  cross: '✘',
+};
 
 export default (argv) => {
   const options = getopts(argv, {
@@ -16,7 +20,7 @@ export default (argv) => {
 
   const args = options._;
   if (!args.length) {
-    console.log('Missing command. Example usage: each-package [command]');
+    console.log('Missing command. Example usage: ep [command]');
     return exit(-1);
   }
 
@@ -37,7 +41,7 @@ export default (argv) => {
 
     if (!options.silent) {
       console.log('\n======================');
-      console.log(`nvu ${args.join(' ')} ${errors.length ? 'failed' : 'succeeded'}`);
+      console.log(`ep ${args.join(' ')} ${errors.length ? 'failed' : 'succeeded'}`);
       results.forEach((res) => console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`));
     }
 
