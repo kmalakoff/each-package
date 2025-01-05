@@ -2,6 +2,7 @@
 
 import path from 'path';
 import exit from 'exit';
+import figures from 'figures';
 import getopts from 'getopts-compat';
 import eachPackage from './index';
 
@@ -36,14 +37,8 @@ export default (argv) => {
 
     if (!options.silent) {
       console.log('\n======================');
-      if (errors.length) {
-        console.log(`Failed (${errors.length}). Passed (${results.length - errors.length})`);
-        for (let index = 0; index < errors.length; index++) {
-          const result = errors[index];
-          console.log(`${path.dirname(result.path)} Error: ${result.error.message}`);
-        }
-      } else console.log(`Passed (${results.length})`);
-      console.log('======================');
+      console.log(`nvu ${args.join(' ')} ${errors.length ? 'failed' : 'succeeed'}`);
+      results.forEach((res) => console.log(`${res.error ? figures.cross : figures.tick} ${res.version}${res.error ? ` Error: ${res.error.message}` : ''}`));
     }
 
     exit(errors.length ? -1 : 0);
