@@ -34,8 +34,10 @@ export default (argv) => {
   options.stdio = 'inherit';
   eachPackage(args[0], args.slice(1), options, (err, results) => {
     if (err && err.message.indexOf('ExperimentalWarning') >= 0) err = null;
-    if (err) console.log(err.message);
-    if (!results) results = [];
+    if (err) {
+      results = err.results;
+      console.log(err.message);
+    }
     const errors = results.filter((result) => !!result.error);
 
     if (!options.silent) {
