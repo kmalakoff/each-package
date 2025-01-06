@@ -35,8 +35,9 @@ export default (argv) => {
   eachPackage(args[0], args.slice(1), options, (err, results) => {
     if (err && err.message.indexOf('ExperimentalWarning') >= 0) err = null;
     if (err) console.log(err.message);
-
+    if (!results) results = [];
     const errors = results.filter((result) => !!result.error);
+
     if (!options.silent) {
       console.log('\n======================');
       console.log(`ep ${args.join(' ')} ${errors.length ? 'failed' : 'succeeded'}`);
