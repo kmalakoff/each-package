@@ -1,4 +1,3 @@
-import './filterExperimental.cjs';
 import worker from './worker';
 
 export default function eachPackage(command, args, options, callback) {
