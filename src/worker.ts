@@ -99,7 +99,8 @@ export default function each(command, args, options, callback) {
       }
     },
     { callbacks: true, concurrency },
-    function iteratorCallback(err) {
+    (err) => {
+      if (err) err.results = results;
       err ? callback(err) : callback(null, results);
     }
   );
