@@ -43,6 +43,6 @@ export default (argv) => {
       console.log(`ep ${args.join(' ')} ${errors.length ? 'failed' : 'succeeded'}`);
       results.forEach((res) => console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`));
     }
-    exit(errors.length ? -1 : 0);
+    exit(err || errors.length ? -1 : 0);
   });
 };
