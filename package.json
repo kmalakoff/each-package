@@ -16,12 +16,9 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": {
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs",
-      "types": "./dist/types/index.d.ts"
-    },
-    "./*": "./*"
+    "import": "./dist/esm/index.mjs",
+    "require": "./dist/cjs/index.cjs",
+    "types": "./dist/types/index.d.ts"
   },
   "main": "dist/cjs/index.cjs",
   "module": "dist/dist/esm/index.mjs",
@@ -30,7 +27,8 @@
     "ep": "./bin/cli.cjs"
   },
   "files": [
-    "dist"
+    "dist",
+    "assets"
   ],
   "scripts": {
     "build": "tsds build",
@@ -40,11 +38,13 @@
     "version": "tsds version"
   },
   "dependencies": {
+    "@lerna-lite/core": "^3.11.0",
     "cross-spawn-cb": "^2.1.2",
     "exit": "^0.1.2",
     "fs-iterator": "^5.2.10",
     "getopts-compat": "^2.2.6",
-    "spawn-streaming": "^1.0.0"
+    "remove-bom-buffer": "^3.0.0",
+    "spawn-streaming": "^1.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
