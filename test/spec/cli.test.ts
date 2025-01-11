@@ -1,9 +1,9 @@
 import assert from 'assert';
 import path from 'path';
 import url from 'url';
-import cr from 'cr';
 import spawn from 'cross-spawn-cb';
 import isVersion from 'is-version';
+import getLines from '../lib/getLines.cjs';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 const CLI = path.join(__dirname, '..', '..', 'bin', 'cli.cjs');
@@ -13,8 +13,7 @@ describe('cli', () => {
     it('basic command', (done) => {
       spawn(CLI, ['--silent', 'echo', '"hello"'], { encoding: 'utf8' }, (err, res) => {
         if (err) return done(err);
-        const lines = cr(res.stdout).split('\n');
-        assert.equal(lines.slice(-2, -1)[0], '"hello"');
+        assert.equal(getLines(res.stdout).slice(-2, -1)[0], '"hello"');
         done();
       });
     });
@@ -22,8 +21,7 @@ describe('cli', () => {
     it('basic command with options', (done) => {
       spawn(CLI, ['--silent', 'node', '--version'], { encoding: 'utf8' }, (err, res) => {
         if (err) return done(err);
-        const lines = cr(res.stdout).split('\n');
-        assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
+        assert.ok(isVersion(getLines(res.stdout).slice(-2, -1)[0], 'v'));
         done();
       });
     });
@@ -31,8 +29,7 @@ describe('cli', () => {
     it('basic command with options (--)', (done) => {
       spawn(CLI, ['--silent', '--', 'node', '--version'], { encoding: 'utf8' }, (err, res) => {
         if (err) return done(err);
-        const lines = cr(res.stdout).split('\n');
-        assert.ok(isVersion(lines.slice(-2, -1)[0], 'v'));
+        assert.ok(isVersion(getLines(res.stdout).slice(-2, -1)[0], 'v'));
         done();
       });
     });

@@ -1,9 +1,9 @@
 import assert from 'assert';
 import path from 'path';
 import url from 'url';
-import cr from 'cr';
 import isVersion from 'is-version';
 import Pinkie from 'pinkie-promise';
+import getLines from '../lib/getLines.cjs';
 
 // @ts-ignore
 import eachPackage from 'each-package';
@@ -29,20 +29,20 @@ describe('library', () => {
     it('basic command', (done) => {
       eachPackage('node', ['--version'], { silent: true, encoding: 'utf8' }, (err, results) => {
         if (err) return done(err);
-        assert.ok(isVersion(cr(results[0].result.stdout).split('\n').slice(-2, -1)[0], 'v'));
+        assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });
     });
     it('basic command (concurrency 10)', (done) => {
       eachPackage('node', ['--version'], { silent: true, encoding: 'utf8', concurrency: 10, cwd: NODE_MODULES }, (err, results) => {
         if (err) return done(err);
-        assert.ok(isVersion(cr(results[0].result.stdout).split('\n').slice(-2, -1)[0], 'v'));
+        assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });
     });
     it('basic command (promises)', async () => {
       const results = await eachPackage('node', ['--version'], { silent: true, encoding: 'utf8' });
-      assert.ok(isVersion(cr(results[0].result.stdout).split('\n').slice(-2, -1)[0], 'v'));
+      assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
     });
   });
 });
