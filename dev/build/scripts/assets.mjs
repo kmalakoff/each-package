@@ -11,7 +11,7 @@ const cwd = process.cwd();
 const dest = path.join(__dirname, '..', '..', '..', 'assets');
 
 const BUILDS = [
-  // { in: '@lerna-lite/core/dist/utils/run-topologically.js', out: 'run-topologically.cjs', post: path.join(__dirname, '..', 'assets', 'post.js') },
+  { in: '@lerna-lite/core/dist/utils/run-topologically.js', out: 'run-topologically.cjs', post: path.join(__dirname, '..', 'assets', 'post.js') },
   { in: '@lerna-lite/core/dist/package.js', out: 'package.cjs', post: path.join(__dirname, '..', 'assets', 'post.js') }
 ];
 
