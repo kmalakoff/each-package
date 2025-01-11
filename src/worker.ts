@@ -27,8 +27,7 @@ export default function each(command, args, options, callback) {
   iterator.forEach(
     (entry) => {
       if (!entry.stats.isFile()) return;
-      const pkg = JSON.parse(removeBOM(fs.readFileSync(entry.fullPath)).toString());
-      packages.push(new Package({ ...pkg, devDependencies: {} } as unknown as RawManifest, path.dirname(entry.fullPath), cwd));
+      packages.push({ package: JSON.parse(removeBOM(fs.readFileSync(entry.fullPath)).toString()), path: entry.fullPath });
     },
     async (err) => {
       if (err) return callback(err);
@@ -36,7 +35,7 @@ export default function each(command, args, options, callback) {
       const results = [];
       try {
         await runTopologically(
-          packages,
+          packages.map((x) => new Package({ ...x.package, devDependencies: {} } as unknown as RawManifest, path.dirname(x.path), cwd)),
           function runner(pkg) {
             return new Promise((resolve, reject) => {
               spawnStreaming(command, args, { ...options, cwd: pkg.location }, { prefix: pkg.name }, (err, res) => {
@@ -44,7 +43,7 @@ export default function each(command, args, options, callback) {
                   res = err as unknown as SpawnResult;
                   err = null;
                 }
-                results.push({ path: path.dirname(pkg.location), error: err, result: res });
+                results.push({ path: pkg.name, error: err, result: res });
                 err ? reject(err) : resolve(undefined);
               });
             });
