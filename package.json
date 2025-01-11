@@ -40,14 +40,11 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "call-once-fn": "^1.0.6",
     "cross-spawn-cb": "^2.1.2",
     "exit": "^0.1.2",
-    "foreman": "^3.0.1",
     "fs-iterator": "^5.2.10",
-    "getopts-compat": "^2.2.5",
-    "lodash.throttle": "^4.1.1",
-    "queue-cb": "^1.4.10"
+    "getopts-compat": "^2.2.6",
+    "spawn-streaming": "^1.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
