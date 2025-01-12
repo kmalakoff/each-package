@@ -39,7 +39,7 @@
   "dependencies": {
     "cross-spawn-cb": "^2.1.2",
     "exit": "^0.1.2",
-    "fs-iterator": "^5.2.10",
+    "fs-iterator": "^5.2.11",
     "getopts-compat": "^2.2.6",
     "queue-cb": "^1.4.11",
     "remove-bom-buffer": "^3.0.0",
@@ -50,7 +50,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.10.5",
     "cr": "^0.1.0",
-    "is-version": "^0.2.5",
+    "is-version": "^0.2.7",
     "pinkie-promise": "^2.0.1"
   },
   "engines": {
