@@ -46,12 +46,8 @@ export default function sortedEntries(options, callback) {
         }
       }
 
-      const sorted = topologicalSort(edges);
-      if (!sorted) return callback(new Error('Cycle detected'));
-      for (const name in packages) {
-        const entry = packages[name];
-        if (!sorted.find((x) => x === entry.package.name)) sorted.push(entry.package.name);
-      }
+      const sorted = topologicalSort<string>(edges, Object.keys(packages));
+      if (sorted.cycles) console.log(`Cycle detected. Skipping: ${JSON.stringify(sorted.cycles)}`);
 
       return callback(
         null,
