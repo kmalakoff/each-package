@@ -55,7 +55,7 @@
     "pinkie-promise": "^2.0.1"
   },
   "engines": {
-    "node": ">=0.8"
+    "node": ">=16"
   },
   "tsds": {
     "source": "src/index.ts"
