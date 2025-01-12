@@ -11,9 +11,9 @@ const figures = {
 
 export default (argv) => {
   const options = getopts(argv, {
-    alias: { depth: 'd', concurrency: 'c', silent: 's' },
-    boolean: ['silent'],
-    default: { depth: Infinity, concurrency: 1 },
+    alias: { depth: 'd', concurrency: 'c', silent: 's', private: 'p' },
+    boolean: ['silent', 'private'],
+    default: { depth: Infinity, concurrency: 1, silent: false, private: false },
     stopEarly: true,
   });
 
@@ -34,7 +34,7 @@ export default (argv) => {
 
     if (!options.silent) {
       console.log('\n======================');
-      console.log(`ep ${args.join(' ')} ${errors.length ? 'failed' : 'succeeded'}`);
+      console.log(`ep ${args.join(' ')} Successes: ${results.length - errors.length} Errors: ${errors.length}`);
       results.forEach((res) => console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`));
     }
     exit(err || errors.length ? -1 : 0);

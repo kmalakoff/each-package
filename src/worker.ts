@@ -1,63 +1,46 @@
-import fs from 'fs';
 import path from 'path';
-import type { RawManifest } from '@lerna-lite/core';
-import Iterator from 'fs-iterator';
-import removeBOM from 'remove-bom-buffer';
-import spawnStreaming, { type SpawnResult } from 'spawn-streaming';
-// @ts-ignore
-import { Package } from '../../assets/package.cjs';
-// @ts-ignore
-import { runTopologically } from '../../assets/run-topologically.cjs';
+import spawn from 'cross-spawn-cb';
+import Queue from 'queue-cb';
+import spawnStreaming from 'spawn-streaming';
+import sortedEntries from './lib/sortedEntries';
+
+import type { SpawnError } from './types';
 
 export default function each(command, args, options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const concurrency = typeof options.concurrency === 'undefined' ? 1 : options.concurrency;
-  const cwd = typeof options.cwd === 'undefined' ? process.cwd() : options.cwd;
 
-  const iterator = new Iterator(cwd, {
-    filter: function filter(entry) {
-      if (entry.stats.isDirectory()) return entry.basename[0] !== '.' && entry.basename !== 'node_modules';
-      if (entry.stats.isFile()) return entry.basename === 'package.json';
-    },
-    depth,
-  });
+  sortedEntries(options, (err, entries) => {
+    if (err) return callback(err);
 
-  const packages = [];
-  iterator.forEach(
-    (entry) => {
-      if (!entry.stats.isFile()) return;
-      packages.push({ package: JSON.parse(removeBOM(fs.readFileSync(entry.fullPath)).toString()), path: entry.fullPath });
-    },
-    async (err) => {
-      if (err) return callback(err);
+    const results = [];
+    const queue = new Queue(concurrency);
 
-      const results = [];
-      try {
-        await runTopologically(
-          packages.map((x) => new Package({ ...x.package, devDependencies: {} } as unknown as RawManifest, path.dirname(x.path), cwd)),
-          function runner(pkg) {
-            return new Promise((resolve, _reject) => {
-              spawnStreaming(command, args, { ...options, cwd: pkg.location }, { prefix: pkg.name }, (err, res) => {
-                if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
-                  res = err as unknown as SpawnResult;
-                  err = null;
-                }
-                results.push({ path: pkg.name, error: err, result: res });
-                resolve(undefined);
-              });
-            });
-          },
-          {
-            concurrency,
-            rejectCycles: false,
+    entries.forEach((entry) => {
+      queue.defer((cb) => {
+        const cwd = path.dirname(entry.fullPath);
+        const prefix = path.dirname(entry.path);
+
+        const next = (err, res) => {
+          if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
+            res = err;
+            err = null;
           }
-        );
-        return callback(null, results);
-      } catch (err) {
-        err.results = results;
-        return callback(err);
-      }
-    }
-  );
+
+          results.push({ path: prefix, command, args, error: err, result: res });
+          if (err && options.concurrency === 1) return cb(err); // break early
+          cb();
+        };
+
+        if (entries.length < 2) spawn(command, args, { ...options, cwd }, next);
+        else spawnStreaming(command, args, { ...options, cwd }, { prefix }, next);
+      });
+    });
+
+    queue.await((err) => {
+      if (err) (err as SpawnError).results = results;
+      err ? callback(err) : callback(null, results);
+    });
+  });
 }
