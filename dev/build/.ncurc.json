@@ -1,4 +1,0 @@
-{
-  "upgrade": true,
-  "reject": ["cross-spawn-6.0.5"]
-}

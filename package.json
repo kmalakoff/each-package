@@ -27,8 +27,7 @@
     "ep": "./bin/cli.cjs"
   },
   "files": [
-    "dist",
-    "assets"
+    "dist"
   ],
   "scripts": {
     "build": "tsds build",
@@ -38,11 +37,11 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "@lerna-lite/core": "^3.11.0",
     "cross-spawn-cb": "^2.1.2",
     "exit": "^0.1.2",
     "fs-iterator": "^5.2.10",
     "getopts-compat": "^2.2.6",
+    "queue-cb": "^1.4.10",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.0.2"
   },
@@ -55,7 +54,7 @@
     "pinkie-promise": "^2.0.1"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=0.8"
   },
   "tsds": {
     "source": "src/index.ts"
