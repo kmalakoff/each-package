@@ -37,14 +37,14 @@ export default function each(command, args, options, callback) {
         await runTopologically(
           packages.map((x) => new Package({ ...x.package, devDependencies: {} } as unknown as RawManifest, path.dirname(x.path), cwd)),
           function runner(pkg) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve, _reject) => {
               spawnStreaming(command, args, { ...options, cwd: pkg.location }, { prefix: pkg.name }, (err, res) => {
                 if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
                   res = err as unknown as SpawnResult;
                   err = null;
                 }
                 results.push({ path: pkg.name, error: err, result: res });
-                err ? reject(err) : resolve(undefined);
+                resolve(undefined);
               });
             });
           },
