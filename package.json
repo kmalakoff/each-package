@@ -41,7 +41,7 @@
     "exit": "^0.1.2",
     "fs-iterator": "^5.2.10",
     "getopts-compat": "^2.2.6",
-    "queue-cb": "^1.4.10",
+    "queue-cb": "^1.4.11",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.0.2"
   },
