@@ -27,7 +27,7 @@ export default (argv) => {
   eachPackage(args[0], args.slice(1), options, (err, results) => {
     if (err && err.message.indexOf('ExperimentalWarning') >= 0) err = null;
     if (err) {
-      results = err.results;
+      results = err.results || [];
       console.log(err.message);
     }
     const errors = results.filter((result) => !!result.error);
