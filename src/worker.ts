@@ -29,7 +29,6 @@ export default function each(command, args, options, callback) {
           }
 
           results.push({ path: prefix, command, args, error: err, result: res });
-          if (err && options.concurrency === 1) return cb(err); // break early
           cb();
         };
 
