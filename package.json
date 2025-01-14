@@ -43,7 +43,7 @@
     "getopts-compat": "^2.2.6",
     "queue-cb": "^1.4.11",
     "remove-bom-buffer": "^3.0.0",
-    "spawn-streaming": "^1.0.7"
+    "spawn-streaming": "^1.0.8"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
