@@ -41,9 +41,9 @@
     "exit": "^0.1.2",
     "fs-iterator": "^5.2.13",
     "getopts-compat": "^2.2.6",
-    "queue-cb": "^1.4.11",
+    "queue-cb": "^1.4.12",
     "remove-bom-buffer": "^3.0.0",
-    "spawn-streaming": "^1.0.9"
+    "spawn-streaming": "^1.0.10"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
