@@ -37,18 +37,18 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "^2.1.5",
+    "cross-spawn-cb": "^2.1.6",
     "exit": "^0.1.2",
-    "fs-iterator": "^5.2.12",
+    "fs-iterator": "^5.2.13",
     "getopts-compat": "^2.2.6",
     "queue-cb": "^1.4.11",
     "remove-bom-buffer": "^3.0.0",
-    "spawn-streaming": "^1.0.8"
+    "spawn-streaming": "^1.0.9"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.5",
+    "@types/node": "^22.10.6",
     "cr": "^0.1.0",
     "is-version": "^0.2.7",
     "pinkie-promise": "^2.0.1"
