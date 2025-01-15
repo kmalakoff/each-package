@@ -8,7 +8,7 @@ import getLines from '../lib/getLines.cjs';
 // @ts-ignore
 import eachPackage from 'each-package';
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
-const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules', '@biomejs');
+const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 
 describe('library', () => {
   (() => {
@@ -28,14 +28,14 @@ describe('library', () => {
   describe('happy path', () => {
     it('basic command', (done) => {
       eachPackage('node', ['--version'], { silent: true, encoding: 'utf8' }, (err, results) => {
-        if (err) return done(err);
+        if (err) return done(err.message);
         assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });
     });
     it('basic command (concurrency 10)', (done) => {
       eachPackage('node', ['--version'], { silent: true, encoding: 'utf8', concurrency: 10, cwd: NODE_MODULES }, (err, results) => {
-        if (err) return done(err);
+        if (err) return done(err.message);
         assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });
