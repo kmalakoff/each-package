@@ -1,1 +1,1 @@
-ignores: ["@types/*", "each-package", "@biomejs/*"]
+ignores: ["each-package"]

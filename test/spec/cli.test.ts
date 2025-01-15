@@ -7,13 +7,13 @@ import getLines from '../lib/getLines.cjs';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 const CLI = path.join(__dirname, '..', '..', 'bin', 'cli.cjs');
-const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules', '@biomejs');
+const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 
 describe('cli', () => {
   describe('happy path', () => {
     it('basic command', (done) => {
       spawn(CLI, ['--silent', 'echo', '"hello"'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
-        if (err) return done(err);
+        if (err) return done(err.message);
         assert.equal(getLines(res.stdout).slice(-2, -1)[0], '"hello"');
         done();
       });
@@ -21,7 +21,7 @@ describe('cli', () => {
 
     it('basic command with options', (done) => {
       spawn(CLI, ['--silent', 'node', '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
-        if (err) return done(err);
+        if (err) return done(err.message);
         assert.ok(isVersion(getLines(res.stdout).slice(-2, -1)[0], 'v'));
         done();
       });
@@ -29,7 +29,7 @@ describe('cli', () => {
 
     it('basic command with options (--)', (done) => {
       spawn(CLI, ['--silent', '--', 'node', '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
-        if (err) return done(err);
+        if (err) return done(err.message);
         assert.ok(isVersion(getLines(res.stdout).slice(-2, -1)[0], 'v'));
         done();
       });
