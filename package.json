@@ -43,7 +43,7 @@
     "getopts-compat": "^2.2.6",
     "queue-cb": "^1.4.13",
     "remove-bom-buffer": "^3.0.0",
-    "spawn-streaming": "^1.0.13"
+    "spawn-streaming": "^1.0.14"
   },
   "devDependencies": {
     "@types/mocha": "*",
