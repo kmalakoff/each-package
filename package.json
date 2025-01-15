@@ -37,13 +37,13 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "^2.1.6",
+    "cross-spawn-cb": "^2.1.7",
     "exit": "^0.1.2",
-    "fs-iterator": "^5.2.13",
+    "fs-iterator": "^5.2.14",
     "getopts-compat": "^2.2.6",
     "queue-cb": "^1.4.13",
     "remove-bom-buffer": "^3.0.0",
-    "spawn-streaming": "^1.0.11"
+    "spawn-streaming": "^1.0.12"
   },
   "devDependencies": {
     "@types/mocha": "*",
