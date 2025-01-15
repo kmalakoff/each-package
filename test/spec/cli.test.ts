@@ -9,6 +9,9 @@ const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : 
 const CLI = path.join(__dirname, '..', '..', 'bin', 'cli.cjs');
 const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 
+const isWindows = process.platform === 'win32' || /^(msys|cygwin)$/.test(process.env.OSTYPE);
+const NODE = isWindows ? 'node.exe' : 'node';
+
 describe('cli', () => {
   describe('happy path', () => {
     it('basic command', (done) => {
@@ -20,7 +23,7 @@ describe('cli', () => {
     });
 
     it('basic command with options', (done) => {
-      spawn(CLI, ['--silent', 'node', '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
+      spawn(CLI, ['--silent', NODE, '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
         if (err) return done(err.message);
         assert.ok(isVersion(getLines(res.stdout).slice(-2, -1)[0], 'v'));
         done();
@@ -28,7 +31,7 @@ describe('cli', () => {
     });
 
     it('basic command with options (--)', (done) => {
-      spawn(CLI, ['--silent', '--', 'node', '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
+      spawn(CLI, ['--silent', '--', NODE, '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
         if (err) return done(err.message);
         assert.ok(isVersion(getLines(res.stdout).slice(-2, -1)[0], 'v'));
         done();
