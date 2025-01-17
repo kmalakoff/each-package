@@ -4,9 +4,14 @@ Run commands in each package folder starting with cwd skipping node_modules fold
 
 ```
 # infinite depth
-$ep run npm
+$ ep npm test
 
-# top level only
-$ep -d0 run npm
-$ep --depth=0 run npm
+# top and second level only (--depth=1)
+$ ep -d1 npm test
+
+# one at a time (--concurrency=1)
+$ ep -c1 npm test
+
+# topological (--topological)
+$ ep -t npm deploy
 ```
