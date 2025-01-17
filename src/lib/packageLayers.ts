@@ -1,9 +1,10 @@
 import fs from 'fs';
+import path from 'path';
 import Iterator from 'fs-iterator';
 import removeBOM from 'remove-bom-buffer';
 import topologicalSort from './topologicalSort';
 
-export default function sortedLayers(options, callback) {
+export default function packageLayers(options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const cwd = options.cwd || process.cwd();
@@ -16,7 +17,7 @@ export default function sortedLayers(options, callback) {
     depth,
   });
 
-  const packages = {};
+  let entries = [];
   iterator.forEach(
     (entry, cb) => {
       if (!entry.stats.isFile()) return cb();
@@ -24,12 +25,13 @@ export default function sortedLayers(options, callback) {
         if (err) return cb(err);
         const pkg = JSON.parse(removeBOM(contents));
         if (pkg.private && !options.private) return cb();
-        if (packages[pkg.name]) {
-          console.log(`Duplicate package named ${pkg.name} at ${packages[pkg.name].path} and ${entry.path}. Skipping`);
+        const existing = entries.find((x) => x.package.name === pkg.name);
+        if (existing) {
+          console.log(`Duplicate package named ${pkg.name} at ${existing.fullPath} and ${entry.fullPath}. Skipping`);
           return cb();
         }
         entry.package = pkg;
-        packages[pkg.name] = entry;
+        entries.push(entry);
         cb();
       });
     },
@@ -37,23 +39,33 @@ export default function sortedLayers(options, callback) {
     (err) => {
       if (err) return callback(err);
 
-      const edges = [];
-      for (const name in packages) {
-        const entry = packages[name];
-        const deps = { ...(entry.package.dependencies || {}), ...(entry.package.optionalDependencies || {}) };
-        for (const dep in deps) {
-          if (packages[dep]) edges.push([dep, entry.package.name]);
-        }
-      }
+      // sort
+      entries = entries.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path)));
 
-      const { layers, cycles } = topologicalSort<string>(edges, Object.keys(packages));
+      // full graph at one layer
+      if (!options.topological) return callback(null, [entries]);
+
+      // build graph edges from dependencies and optionalDependencies
+      const edges = [];
+      entries.forEach((entry) => {
+        const deps = { ...(entry.package.dependencies || {}), ...(entry.package.optionalDependencies || {}) };
+        for (const name in deps) {
+          const depPackage = entries.find((x) => x.package.name === name);
+          if (depPackage) edges.push([name, entry.package.name]);
+        }
+      });
+
+      const { layers, cycles } = topologicalSort<string>(
+        edges,
+        entries.map((entry) => entry.package.name)
+      );
       if (cycles && cycles.length) {
         cycles.forEach((c) => console.log(`Skipping cycle: ${c.join(' -> ')}`));
       }
 
       return callback(
         null,
-        layers.map((layer) => layer.map((x) => packages[x]))
+        layers.map((layer) => layer.map((name) => entries.find((x) => x.package.name === name)))
       );
     }
   );
