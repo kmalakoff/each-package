@@ -3,7 +3,7 @@ import Iterator from 'fs-iterator';
 import removeBOM from 'remove-bom-buffer';
 import topologicalSort from './topologicalSort';
 
-export default function sortedEntries(options, callback) {
+export default function sortedLayers(options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const cwd = options.cwd || process.cwd();
@@ -46,12 +46,14 @@ export default function sortedEntries(options, callback) {
         }
       }
 
-      const sorted = topologicalSort<string>(edges, Object.keys(packages));
-      if (sorted.cycles) console.log(`Cycle detected. Skipping: ${JSON.stringify(sorted.cycles)}`);
+      const { layers, cycles } = topologicalSort<string>(edges, Object.keys(packages));
+      if (cycles && cycles.length) {
+        cycles.forEach((c) => console.log(`Skipping cycle: ${c.join(' -> ')}`));
+      }
 
       return callback(
         null,
-        sorted.map((x) => packages[x])
+        layers.map((layer) => layer.map((x) => packages[x]))
       );
     }
   );
