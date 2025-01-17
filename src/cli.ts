@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import path from 'path';
 import exit from 'exit';
 import getopts from 'getopts-compat';
 import run from './index';
@@ -12,8 +13,8 @@ const ERROR_CODE = 5;
 
 export default (argv, name) => {
   const options = getopts(argv, {
-    alias: { depth: 'd', concurrency: 'c', silent: 's', private: 'p' },
-    boolean: ['silent', 'private'],
+    alias: { depth: 'd', concurrency: 'c', topological: 't', silent: 's', private: 'p' },
+    boolean: ['topological', 'silent', 'private'],
     default: { depth: Infinity, concurrency: 1, silent: false, private: false },
     stopEarly: true,
   });
@@ -30,6 +31,7 @@ export default (argv, name) => {
       return exit(ERROR_CODE);
     }
     if (err) results = err.results;
+    results = results.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path)));
     const errors = results.filter((result) => !!result.error);
 
     if (!options.silent) {

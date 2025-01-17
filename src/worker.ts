@@ -1,8 +1,7 @@
 import path from 'path';
-import spawn from 'cross-spawn-cb';
 import Queue from 'queue-cb';
 import spawnStreaming from 'spawn-streaming';
-import sortedLayers from './lib/sortedLayers';
+import packageLayers from './lib/packageLayers';
 
 import type { SpawnError } from './types';
 
@@ -11,9 +10,8 @@ export default function each(command, args, options, callback) {
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const concurrency = typeof options.concurrency === 'undefined' ? 1 : options.concurrency;
 
-  sortedLayers(options, (err, layers) => {
+  packageLayers(options, (err, layers) => {
     if (err) return callback(err);
-    const isSingle = layers.length < 2 && layers[0].length < 2;
 
     const results = [];
     function processLayers(layers, callback) {
@@ -36,14 +34,11 @@ export default function each(command, args, options, callback) {
             cb();
           };
 
-          if (isSingle) spawn(command, args, { ...options, cwd }, next);
-          else spawnStreaming(command, args, { ...options, cwd }, { prefix }, next);
+          spawnStreaming(command, args, { ...options, cwd }, { prefix }, next);
         });
       });
 
-      queue.await((err) => {
-        err ? callback(err) : processLayers(layers, callback);
-      });
+      queue.await((err) => (err ? callback(err) : processLayers(layers, callback)));
     }
 
     processLayers(layers, (err) => {
