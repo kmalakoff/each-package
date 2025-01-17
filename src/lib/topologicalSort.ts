@@ -1,87 +1,139 @@
-export interface Result<T> extends Array<T> {
-  cycles?: Array<T>;
+export type Node = string | number | symbol;
+export type Graph<T extends Node> = {
+  [key in T]: Array<T>;
+};
+export type Counter<T extends Node> = {
+  [key in T]: number;
+};
+export interface GraphResult<T extends Node> {
+  graph: Graph<T>;
+  inDegree: Counter<T>;
 }
 
-/**
- * Implements topological sort for a directed acyclic graph (DAG)
- * @param {Array} edges - Array of [from, to] pairs representing directed edges
- * @returns {Array} A topologically sorted array of nodes, or null if a cycle is detected
- */
-export default function topologicalSort<T>(edges: Array<T>, allNodes?: Array<T>): Result<T> {
-  type NodeSet = {
-    [key in string]: boolean;
-  };
+export interface SortResult<T> {
+  layers: Array<Array<T>>;
+  cycles: Array<Array<T>>;
+}
 
-  // Build adjacency list and collect unique nodes
-  const graph = {};
-  const nodes = {} as NodeSet;
+function buildGraph<T extends Node>(edges: Array<Array<T>>, nodes?: Array<T>): GraphResult<T> {
+  const graph = {} as Graph<T>;
+  const inDegree = {} as Counter<T>;
 
-  // @ts-ignore
-  if (allNodes)
-    allNodes.forEach((node) => {
-      nodes[node as string] = true;
+  // all nodes
+  if (nodes)
+    nodes.forEach((node) => {
+      graph[node] = [];
+      inDegree[node] = 0;
     });
 
+  // all edges
   edges.forEach((edge) => {
     const from = edge[0];
     const to = edge[1];
 
-    // Add nodes to set
-    nodes[from] = true;
-    nodes[to] = true;
-
-    // Build adjacency list
+    // initialize unseen
     if (!graph[from]) graph[from] = [];
+    if (!graph[to]) graph[to] = [];
+    if (!inDegree[from]) inDegree[from] = 0;
+    if (!inDegree[to]) inDegree[to] = 0;
+
+    // add edge
     graph[from].push(to);
-  });
-
-  // Ensure all nodes have entries in graph, even if they have no outgoing edges
-  Object.keys(nodes).forEach((node) => {
-    if (!graph[node]) graph[node] = [];
-  });
-
-  const nodeList = Object.keys(nodes);
-  const inDegree = {};
-  const queue = [];
-  const result: Result<T> = [];
-
-  // Initialize in-degree for all nodes to 0
-  nodeList.forEach((node) => {
-    inDegree[node] = 0;
-  });
-
-  // Calculate in-degree for each node
-  edges.forEach((edge) => {
-    const to = edge[1];
     inDegree[to]++;
   });
 
-  // Add all nodes with in-degree 0 to the queue
-  nodeList.forEach((node) => {
-    if (inDegree[node] === 0) queue.push(node);
-  });
+  return {
+    graph: graph,
+    inDegree: inDegree,
+  };
+}
 
-  // Process the queue
-  while (queue.length > 0) {
-    const node = queue.shift();
-    result.push(node);
+function collectCycles<T extends Node>(graph: Graph<T>): Array<Array<T>> {
+  const visited = {};
+  const tempMark = {};
+  const cycles = [];
 
-    // Reduce in-degree of all neighbors
-    if (graph[node]) {
+  function visit(node, ancestors) {
+    // found a cycle
+    if (tempMark[node]) {
+      cycles.push(ancestors.concat(node));
+      return;
+    }
+
+    // visit only once
+    if (visited[node]) return;
+    visited[node] = true;
+
+    // check for cycles from here
+    tempMark[node] = true;
+    graph[node].forEach((neighbor) => {
+      visit(neighbor, ancestors.concat(node));
+    });
+    delete tempMark[node];
+  }
+
+  // check all nodes
+  let nodes = Object.keys(graph);
+  while (nodes.length > 0) {
+    visit(nodes[0], []);
+
+    // remove processed
+    nodes = nodes.filter((node) => !visited[node]);
+  }
+
+  return cycles;
+}
+
+export default function topologicalSort<T extends Node>(edges: Array<Array<T>>, nodes?: Array<T>) {
+  const layers = [];
+  const graphData = buildGraph(edges, nodes);
+  const graph = graphData.graph;
+  const inDegree = graphData.inDegree;
+
+  // find nodes with no incoming edges
+  function findSources() {
+    const sources = [];
+    Object.keys(inDegree).forEach((node) => {
+      if (inDegree[node] === 0) sources.push(node);
+    });
+    return sources;
+  }
+
+  // process the graph level by level
+  let currentLevel = findSources();
+  while (currentLevel.length > 0) {
+    layers.push(currentLevel.slice());
+
+    // track next level's nodes
+    const nextLevel = [];
+    const processed = {};
+
+    // process all nodes in current level
+    currentLevel.forEach((node) => {
+      // remove the node
+      inDegree[node] = -1;
+
+      // reduce inDegree for all neighbors
       graph[node].forEach((neighbor) => {
         inDegree[neighbor]--;
 
-        // If in-degree becomes 0, add to queue
-        if (inDegree[neighbor] === 0) queue.push(neighbor);
+        // If neighbor has no more dependencies and hasn't been processed
+        if (inDegree[neighbor] === 0 && !processed[neighbor]) {
+          nextLevel.push(neighbor);
+          processed[neighbor] = true;
+        }
       });
-    }
+    });
+
+    // Move to next level
+    currentLevel = nextLevel;
   }
 
-  // If result length doesn't match number of nodes, there's a cycle
-  if (result.length !== nodeList.length) {
-    // https://stackoverflow.com/questions/1187518/how-to-get-the-difference-between-two-arrays-in-javascript
-    result.cycles = nodeList.filter((x) => result.indexOf(x as T) < 0) as Array<T>;
-  }
+  // Check for cycles
+  const hasCycles = Object.keys(inDegree).some((node) => inDegree[node] > 0);
 
-  return result;
+  return {
+    layers,
+    cycles: hasCycles ? collectCycles(graph) : [],
+  };
 }
