@@ -2,12 +2,13 @@
 
 import exit from 'exit';
 import getopts from 'getopts-compat';
-import eachPackage from './index';
+import run from './index';
 
 const figures = {
   tick: '✔',
   cross: '✘',
 };
+const ERROR_CODE = 5;
 
 export default (argv, name) => {
   const options = getopts(argv, {
@@ -20,16 +21,15 @@ export default (argv, name) => {
   const args = options._;
   if (!args.length) {
     console.log(`Missing command. Example usage: ${name} [command]`);
-    return exit(4);
+    return exit(ERROR_CODE);
   }
 
-  options.stdio = 'inherit';
-  eachPackage(args[0], args.slice(1), options, (err, results) => {
-    if (err && err.message.indexOf('ExperimentalWarning') >= 0) err = null;
-    if (err) {
-      results = err.results || [];
+  const next = (err, results) => {
+    if (err && !err.results) {
       console.log(err.message);
+      return exit(ERROR_CODE);
     }
+    if (err) results = err.results;
     const errors = results.filter((result) => !!result.error);
 
     if (!options.silent) {
@@ -40,6 +40,19 @@ export default (argv, name) => {
       console.log(`${figures.tick} ${results.length - errors.length} succeeded`);
       if (errors.length) console.log(`${figures.cross} ${errors.length} failed`);
     }
-    exit(err || errors.length ? 5 : 0);
-  });
+    exit(err || errors.length ? ERROR_CODE : 0);
+  };
+
+  // DEBUG MODE
+  if (typeof process.env.DEBUG !== 'undefined') {
+    options.encoding = 'utf8';
+    return run(args[0], args.slice(1), options, (err, results) => {
+      if (err) console.log(JSON.stringify({ err }));
+      (results || err.results || []).forEach(({ error, result }) => console.log((error || result).stdout));
+      next(err, results);
+    });
+  }
+
+  options.stdio = 'inherit'; // pass through stdio
+  return run(args[0], args.slice(1), options, next);
 };
