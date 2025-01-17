@@ -15,7 +15,7 @@ export default (argv, name) => {
   const options = getopts(argv, {
     alias: { depth: 'd', concurrency: 'c', topological: 't', silent: 's', private: 'p' },
     boolean: ['topological', 'silent', 'private'],
-    default: { depth: Infinity, concurrency: 1, silent: false, private: false },
+    default: { depth: Infinity, concurrency: Infinity, topological: false, silent: false, private: false },
     stopEarly: true,
   });
 
