@@ -31,7 +31,6 @@ export default (argv, name) => {
       return exit(ERROR_CODE);
     }
     if (err) results = err.results;
-    results = results.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path)));
     const errors = results.filter((result) => !!result.error);
 
     if (!options.silent) {

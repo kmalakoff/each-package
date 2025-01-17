@@ -17,7 +17,7 @@ export default function packageLayers(options, callback) {
     depth,
   });
 
-  let entries = [];
+  const entries = [];
   iterator.forEach(
     (entry, cb) => {
       if (!entry.stats.isFile()) return cb();
@@ -39,11 +39,11 @@ export default function packageLayers(options, callback) {
     (err) => {
       if (err) return callback(err);
 
-      // sort
-      entries = entries.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path)));
-
-      // full graph at one layer
-      if (!options.topological) return callback(null, [entries]);
+      // full graph at one layer, sorted by prefix
+      if (!options.topological) {
+        const sorted = entries.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path)));
+        return callback(null, [sorted]);
+      }
 
       // build graph edges from dependencies and optionalDependencies
       const edges = [];
