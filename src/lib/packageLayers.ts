@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import Iterator from 'fs-iterator';
 import removeBOM from 'remove-bom-buffer';
-import topologicalSort from './topologicalSort';
+import { Graph, sort } from 'topological-sort-group';
 
 export default function packageLayers(options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
@@ -45,27 +45,26 @@ export default function packageLayers(options, callback) {
         return callback(null, [sorted]);
       }
 
+      const graph = new Graph();
+      entries.forEach((entry) => graph.add(entry.package.name));
+
       // build graph edges from dependencies and optionalDependencies
-      const edges = [];
       entries.forEach((entry) => {
         const deps = { ...(entry.package.dependencies || {}), ...(entry.package.optionalDependencies || {}) };
         for (const name in deps) {
           const depPackage = entries.find((x) => x.package.name === name);
-          if (depPackage) edges.push([name, entry.package.name]);
+          if (depPackage) graph.add(name, entry.package.name);
         }
       });
 
-      const { layers, cycles } = topologicalSort<string>(
-        edges,
-        entries.map((entry) => entry.package.name)
-      );
+      const { nodes, cycles } = sort(graph);
       if (cycles && cycles.length) {
         cycles.forEach((c) => console.log(`Skipping cycle: ${c.join(' -> ')}`));
       }
 
       return callback(
         null,
-        layers.map((layer) => layer.map((name) => entries.find((x) => x.package.name === name)))
+        nodes.map((layer) => layer.map((name) => entries.find((x) => x.package.name === name)))
       );
     }
   );
