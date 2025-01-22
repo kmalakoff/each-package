@@ -45,8 +45,8 @@ export default function packageLayers(options, callback) {
         return callback(null, [sorted]);
       }
 
-      const graph = new Graph();
-      entries.forEach((entry) => graph.add(entry.package.name));
+      const graph = new Graph({ path: 'package.name' });
+      entries.forEach((entry) => graph.add(entry));
 
       // build graph edges from dependencies and optionalDependencies
       entries.forEach((entry) => {
@@ -58,14 +58,8 @@ export default function packageLayers(options, callback) {
       });
 
       const { nodes, cycles } = sort(graph);
-      if (cycles && cycles.length) {
-        cycles.forEach((c) => console.log(`Skipping cycle: ${c.join(' -> ')}`));
-      }
-
-      return callback(
-        null,
-        nodes.map((layer) => layer.map((name) => entries.find((x) => x.package.name === name)))
-      );
+      if (cycles && cycles.length) cycles.forEach((c) => console.log(`Skipping cycle: ${c.join(' -> ')}`));
+      return callback(null, nodes);
     }
   );
 }
