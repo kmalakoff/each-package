@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import Iterator from 'fs-iterator';
+import find from 'lodash.find';
 import removeBOM from 'remove-bom-buffer';
 import { Graph, sort } from 'topological-sort-group';
 
@@ -25,7 +26,7 @@ export default function packageLayers(options, callback) {
         if (err) return cb(err);
         const pkg = JSON.parse(removeBOM(contents));
         if (pkg.private && !options.private) return cb();
-        const existing = entries.find((x) => x.package.name === pkg.name);
+        const existing = find(entries, (x) => x.package.name === pkg.name);
         if (existing) {
           console.log(`Duplicate package named ${pkg.name} at ${existing.fullPath} and ${entry.fullPath}. Skipping`);
           return cb();
@@ -52,8 +53,8 @@ export default function packageLayers(options, callback) {
       entries.forEach((entry) => {
         const deps = { ...(entry.package.dependencies || {}), ...(entry.package.optionalDependencies || {}) };
         for (const name in deps) {
-          const depPackage = entries.find((x) => x.package.name === name);
-          if (depPackage) graph.add(name, entry.package.name);
+          const found = find(entries, (x) => x.package.name === name); // dependency in graph
+          if (found) graph.add(name, entry.package.name);
         }
       });
 
