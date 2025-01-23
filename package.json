@@ -37,9 +37,9 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "^2.1.14",
+    "cross-spawn-cb": "^2.1.15",
     "exit": "^0.1.2",
-    "fs-iterator": "^5.2.18",
+    "fs-iterator": "^5.2.19",
     "getopts-compat": "^2.2.6",
     "lodash.find": "^4.6.0",
     "queue-cb": "^1.4.13",
