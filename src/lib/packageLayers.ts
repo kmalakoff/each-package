@@ -26,11 +26,6 @@ export default function packageLayers(options, callback) {
         if (err) return cb(err);
         const pkg = JSON.parse(removeBOM(contents));
         if (pkg.private && !options.private) return cb();
-        const existing = find(entries, (x) => x.package.name === pkg.name);
-        if (existing) {
-          console.log(`Duplicate package named ${pkg.name} at ${existing.fullPath} and ${entry.fullPath}. Skipping`);
-          return cb();
-        }
         entry.package = pkg;
         entries.push(entry);
         cb();
