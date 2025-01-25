@@ -7,6 +7,7 @@ import packageLayers from './lib/packageLayers';
 import type { SpawnError } from './types';
 
 export default function worker(command, args, options, callback) {
+  const spawnOptions = { cwd: process.cwd(), ...options };
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const concurrency = typeof options.concurrency === 'undefined' ? 1 : options.concurrency;
@@ -22,7 +23,7 @@ export default function worker(command, args, options, callback) {
       const queue = new Queue(concurrency);
       entries.forEach((entry) => {
         queue.defer((cb) => {
-          const cwd = path.dirname(entry.fullPath);
+          const _cwd = path.dirname(entry.fullPath);
           const prefix = path.dirname(entry.path);
 
           const next = (err, res) => {
@@ -35,8 +36,8 @@ export default function worker(command, args, options, callback) {
             cb();
           };
 
-          if (spawnTerm) spawnTerm(command, args, { ...options, cwd }, { group: prefix, expanded: options.expanded }, next);
-          else spawnStreaming(command, args, { ...options, cwd }, { prefix }, next);
+          if (spawnTerm) spawnTerm(command, args, spawnOptions, { group: prefix, expanded: options.expanded }, next);
+          else spawnStreaming(command, args, spawnOptions, { prefix }, next);
         });
       });
 
