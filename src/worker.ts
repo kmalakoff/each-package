@@ -1,6 +1,7 @@
 import path from 'path';
 import Queue from 'queue-cb';
 import spawnStreaming from 'spawn-streaming';
+import spawnTerm from 'spawn-term';
 import packageLayers from './lib/packageLayers';
 
 import type { SpawnError } from './types';
@@ -34,7 +35,8 @@ export default function worker(command, args, options, callback) {
             cb();
           };
 
-          spawnStreaming(command, args, { ...options, cwd }, { prefix }, next);
+          if (spawnTerm) spawnTerm(command, args, { ...options, cwd }, { group: prefix, expanded: options.expanded }, next);
+          else spawnStreaming(command, args, { ...options, cwd }, { prefix }, next);
         });
       });
 
