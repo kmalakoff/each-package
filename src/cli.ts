@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 
-import path from 'path';
 import exit from 'exit';
 import getopts from 'getopts-compat';
+import { figures } from 'spawn-term';
 import run from './index';
 
-const figures = {
-  tick: '✔',
-  cross: '✘',
-};
 const ERROR_CODE = 5;
 
 export default (argv, name) => {
