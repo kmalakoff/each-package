@@ -2,16 +2,16 @@
 
 import exit from 'exit';
 import getopts from 'getopts-compat';
-import { figures } from 'spawn-term';
+import spawnTerm, { figures, formatArguments } from 'spawn-term';
 import run from './index';
 
 const ERROR_CODE = 5;
 
 export default (argv, name) => {
   const options = getopts(argv, {
-    alias: { depth: 'd', concurrency: 'c', topological: 't', silent: 's', private: 'p' },
-    boolean: ['topological', 'silent', 'private'],
-    default: { depth: Infinity, concurrency: Infinity, topological: false, silent: false, private: false },
+    alias: { depth: 'd', concurrency: 'c', topological: 't', expanded: 'e', silent: 's', private: 'p' },
+    boolean: ['topological', 'expanded', 'silent', 'private'],
+    default: { depth: Infinity, concurrency: Infinity, topological: false, expanded: false, silent: false, private: false },
     stopEarly: true,
   });
 
@@ -31,10 +31,12 @@ export default (argv, name) => {
     const errors = results.filter((result) => !!result.error);
 
     if (!options.silent) {
-      console.log('\n======================');
-      results.forEach((res) => console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`));
+      if (!spawnTerm) {
+        console.log('\n======================');
+        results.forEach((res) => console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`));
+      }
       console.log('\n----------------------');
-      console.log(`${name} ${args.map((x) => (x.indexOf(' ') >= 0 ? `"${x}"` : x)).join(' ')}`);
+      console.log(`${name} ${formatArguments(args)}`);
       console.log(`${figures.tick} ${results.length - errors.length} succeeded`);
       if (errors.length) console.log(`${figures.cross} ${errors.length} failed`);
     }
