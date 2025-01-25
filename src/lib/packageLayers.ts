@@ -35,7 +35,7 @@ export default function packageLayers(options, callback) {
     (err) => {
       if (err) return callback(err);
 
-      // full graph at one layer, sorted by prefix
+      // full graph at one layer, sorted by relative path
       if (!options.topological) {
         const sorted = entries.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path)));
         return callback(null, [sorted]);
