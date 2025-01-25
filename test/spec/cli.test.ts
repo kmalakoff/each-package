@@ -10,34 +10,31 @@ const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 
 const isWindows = process.platform === 'win32' || /^(msys|cygwin)$/.test(process.env.OSTYPE);
 const NODE = isWindows ? 'node.exe' : 'node';
+const res = spawn.sync(NODE, ['--version'], { encoding: 'utf8' });
+const VERSION = cr(res.stdout).split('\n')[0];
 
 describe('cli', () => {
   describe('happy path', () => {
     it('basic command', (done) => {
-      const expected = '"hello"';
       spawn(CLI, ['--silent', 'echo', '"hello"'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
         if (err) return done(err.message);
-        assert.ok(res.stdout.indexOf(expected) >= 0);
+        assert.ok(res.stdout.indexOf('"hello"') >= 0);
         done();
       });
     });
 
     it('basic command with options', (done) => {
-      const res = spawn.sync(NODE, ['--version'], { encoding: 'utf8' });
-      const expected = cr(res.stdout).split('\n')[0];
       spawn(CLI, ['--silent', NODE, '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
         if (err) return done(err.message);
-        assert.ok(res.stdout.indexOf(expected) >= 0);
+        assert.ok(res.stdout.indexOf(VERSION) >= 0);
         done();
       });
     });
 
     it('basic command with options (--)', (done) => {
-      const res = spawn.sync(NODE, ['--version'], { encoding: 'utf8' });
-      const expected = cr(res.stdout).split('\n')[0];
       spawn(CLI, ['--silent', '--', NODE, '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
         if (err) return done(err.message);
-        assert.ok(res.stdout.indexOf(expected) >= 0);
+        assert.ok(res.stdout.indexOf(VERSION) >= 0);
         done();
       });
     });
