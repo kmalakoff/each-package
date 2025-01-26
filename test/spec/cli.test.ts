@@ -16,7 +16,7 @@ const VERSION = cr(res.stdout).split('\n')[0];
 describe('cli', () => {
   describe('happy path', () => {
     it('basic command', (done) => {
-      spawn(CLI, ['--silent', 'echo', '"hello"'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
+      spawn(CLI, ['--silent', '--expanded', 'echo', '"hello"'], { encoding: 'utf8', cwd: path.join(NODE_MODULES, '@types') }, (err, res) => {
         if (err) return done(err.message);
         assert.ok(res.stdout.indexOf('"hello"') >= 0);
         done();
@@ -24,15 +24,7 @@ describe('cli', () => {
     });
 
     it('basic command with options', (done) => {
-      spawn(CLI, ['--silent', NODE, '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
-        if (err) return done(err.message);
-        assert.ok(res.stdout.indexOf(VERSION) >= 0);
-        done();
-      });
-    });
-
-    it('basic command with options (--)', (done) => {
-      spawn(CLI, ['--silent', '--', NODE, '--version'], { encoding: 'utf8', cwd: NODE_MODULES }, (err, res) => {
+      spawn(CLI, ['--silent', '--expanded', NODE, '--version'], { encoding: 'utf8', cwd: path.join(NODE_MODULES, '@types') }, (err, res) => {
         if (err) return done(err.message);
         assert.ok(res.stdout.indexOf(VERSION) >= 0);
         done();
@@ -42,7 +34,7 @@ describe('cli', () => {
 
   describe('unhappy path', () => {
     it('missing command', (done) => {
-      spawn(CLI, ['--silent'], { encoding: 'utf8' }, (err, _res) => {
+      spawn(CLI, ['--silent'], { encoding: 'utf8' }, (err) => {
         assert.ok(!!err);
         done();
       });

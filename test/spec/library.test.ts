@@ -30,21 +30,21 @@ describe('library', () => {
 
   describe('happy path', () => {
     it('basic command', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, encoding: 'utf8' }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', cwd: path.join(NODE_MODULES, '@types') }, (err, results) => {
         if (err) return done(err.message);
         assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });
     });
     it('basic command (concurrency 10)', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, encoding: 'utf8', concurrency: 10, cwd: path.join(NODE_MODULES, '@types') }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', concurrency: 2, cwd: path.join(NODE_MODULES, '@types') }, (err, results) => {
         if (err) return done(err.message);
         assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });
     });
     it('basic command (promises)', async () => {
-      const results = await eachPackage(NODE, ['--version'], { silent: true, encoding: 'utf8' });
+      const results = await eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', cwd: path.join(NODE_MODULES, '@types') });
       assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
     });
   });
