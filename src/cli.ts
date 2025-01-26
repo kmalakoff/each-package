@@ -9,9 +9,9 @@ const ERROR_CODE = 5;
 
 export default (argv, name) => {
   const options = getopts(argv, {
-    alias: { depth: 'd', concurrency: 'c', topological: 't', expanded: 'e', silent: 's', private: 'p' },
-    boolean: ['topological', 'expanded', 'silent', 'private'],
-    default: { depth: Infinity, concurrency: Infinity, topological: false, expanded: false, silent: false, private: false },
+    alias: { depth: 'd', concurrency: 'c', topological: 't', expanded: 'e', streaming: 's', silent: 'si', private: 'p' },
+    boolean: ['topological', 'expanded', 'streaming', 'silent', 'private'],
+    default: { depth: Infinity, concurrency: Infinity },
     stopEarly: true,
   });
 
