@@ -35,7 +35,7 @@ export default function worker(command, args, options, callback) {
             cb();
           };
 
-          if (spawnTerm) spawnTerm(command, args, spawnOptions, { group: prefix, expanded: options.expanded }, next);
+          if (spawnTerm && !options.streaming) spawnTerm(command, args, spawnOptions, { group: prefix, expanded: options.expanded }, next);
           else spawnStreaming(command, args, spawnOptions, { prefix }, next);
         });
       });
