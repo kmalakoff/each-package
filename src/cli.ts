@@ -16,7 +16,7 @@ export default (argv, name) => {
   });
 
   const args = options._;
-  if (!args.length) {
+  if (args.length === 0) {
     console.log(`Missing command. Example usage: ${name} [command]`);
     return exit(ERROR_CODE);
   }
