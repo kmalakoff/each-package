@@ -46,7 +46,7 @@
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.0.29",
     "spawn-term": "^0.1.45",
-    "topological-sort-group": "^0.1.6"
+    "topological-sort-group": "^0.1.7"
   },
   "devDependencies": {
     "@types/mocha": "*",
