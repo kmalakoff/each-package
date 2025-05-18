@@ -38,15 +38,15 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "^2.1.24",
+    "cross-spawn-cb": "^2.1.25",
     "exit": "^0.1.2",
-    "fs-iterator": "^5.2.26",
+    "fs-iterator": "^5.2.27",
     "getopts-compat": "^2.2.6",
     "lodash.find": "^4.6.0",
     "queue-cb": "^1.4.17",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.0.33",
-    "spawn-term": "^0.1.51",
+    "spawn-term": "^0.1.52",
     "topological-sort-group": "^0.1.12"
   },
   "devDependencies": {
