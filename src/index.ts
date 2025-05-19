@@ -1,6 +1,6 @@
-import worker from './worker';
+import worker from './worker.js';
 
-export * from './types';
+export * from './types.js';
 export default function eachPackage(command, args, options, callback?) {
   if (typeof options === 'function') {
     callback = options;
