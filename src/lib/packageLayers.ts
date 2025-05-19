@@ -1,9 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import Iterator from 'fs-iterator';
+import Iterator, { type Entry } from 'fs-iterator';
 import find from 'lodash.find';
 import removeBOM from 'remove-bom-buffer';
 import { Graph, sort } from 'topological-sort-group';
+
+interface PackageEntry extends Entry {
+  package: { name: string; dependencies: object; optionalDependencies: object };
+}
 
 export default function packageLayers(options, callback) {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
@@ -20,8 +24,11 @@ export default function packageLayers(options, callback) {
 
   const entries = [];
   iterator.forEach(
-    (entry, cb) => {
-      if (!entry.stats.isFile()) return cb();
+    (entry: PackageEntry, cb): undefined => {
+      if (!entry.stats.isFile()) {
+        cb();
+        return;
+      }
       fs.readFile(entry.fullPath, 'utf8', (err, contents) => {
         if (err) return cb(err);
         const pkg = JSON.parse(removeBOM(contents));
@@ -45,7 +52,7 @@ export default function packageLayers(options, callback) {
       entries.forEach((entry) => graph.add(entry));
 
       // build graph edges from dependencies and optionalDependencies
-      entries.forEach((entry) => {
+      entries.forEach((entry: PackageEntry) => {
         const deps = { ...(entry.package.dependencies || {}), ...(entry.package.optionalDependencies || {}) };
         for (const name in deps) {
           const found = find(entries, (x) => x.package.name === name); // dependency in graph
