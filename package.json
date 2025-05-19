@@ -17,12 +17,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     },
     "./package.json": "./package.json"
   },
-  "main": "dist/cjs/index.cjs",
+  "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.cts",
   "bin": {
     "ep": "./bin/cli.cjs"
@@ -38,12 +38,12 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "^2.1.25",
+    "cross-spawn-cb": "^2.2.0",
     "exit": "^0.1.2",
-    "fs-iterator": "^5.2.27",
+    "fs-iterator": "^5.3.7",
     "getopts-compat": "^2.2.6",
     "lodash.find": "^4.6.0",
-    "queue-cb": "^1.4.17",
+    "queue-cb": "^1.5.0",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.0.34",
     "spawn-term": "^0.1.52",
