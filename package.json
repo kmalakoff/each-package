@@ -45,8 +45,8 @@
     "lodash.find": "^4.6.0",
     "queue-cb": "^1.5.0",
     "remove-bom-buffer": "^3.0.0",
-    "spawn-streaming": "^1.0.36",
-    "spawn-term": "^0.1.55",
+    "spawn-streaming": "^1.0.37",
+    "spawn-term": "^0.2.0",
     "topological-sort-group": "^0.1.13"
   },
   "devDependencies": {
