@@ -24,4 +24,5 @@ jobs:
       - run: npm run build
       - run: tsds validate
       - run: npm run test
+      - run: nvu 24 npm run test
       - run: npm run test:engines
