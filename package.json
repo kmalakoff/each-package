@@ -38,7 +38,7 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "^2.2.7",
+    "cross-spawn-cb": "^2.2.8",
     "exit": "^0.1.2",
     "fs-iterator": "^5.3.15",
     "getopts-compat": "^2.2.6",
