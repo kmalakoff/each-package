@@ -4,6 +4,7 @@ import spawnStreaming from 'spawn-streaming';
 import spawnTerm from 'spawn-term';
 import packageLayers from './lib/packageLayers.js';
 
+import type { SpawnResult } from 'cross-spawn-cb';
 import type { SpawnError } from './types.js';
 
 export default function worker(command, args, options, callback) {
@@ -25,15 +26,15 @@ export default function worker(command, args, options, callback) {
           const spawnOptions = { ...options, cwd: path.dirname(entry.fullPath) };
           const prefix = path.dirname(entry.path);
 
-          const next = (err, res) => {
+          function next(err?: Error, res?: SpawnResult): undefined {
             if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
-              res = err;
+              res = err as unknown as SpawnResult;
               err = null;
             }
 
             results.push({ path: prefix, command, args, error: err, result: res });
             cb();
-          };
+          }
 
           if (spawnTerm && !options.streaming) spawnTerm(command, args, spawnOptions, { group: prefix, expanded: options.expanded }, next);
           else spawnStreaming(command, args, spawnOptions, { prefix }, next);
