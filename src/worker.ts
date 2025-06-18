@@ -1,10 +1,9 @@
+import type { SpawnResult } from 'cross-spawn-cb';
 import path from 'path';
 import Queue from 'queue-cb';
 import spawnStreaming from 'spawn-streaming';
 import spawnTerm from 'spawn-term';
 import packageLayers from './lib/packageLayers.js';
-
-import type { SpawnResult } from 'cross-spawn-cb';
 import type { SpawnError } from './types.js';
 
 export default function worker(command, args, options, callback) {
