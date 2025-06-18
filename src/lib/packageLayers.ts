@@ -1,7 +1,7 @@
 import fs from 'fs';
-import path from 'path';
 import Iterator, { type Entry } from 'fs-iterator';
 import find from 'lodash.find';
+import path from 'path';
 import removeBOM from 'remove-bom-buffer';
 import { Graph, sort } from 'topological-sort-group';
 

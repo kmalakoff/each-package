@@ -1,12 +1,12 @@
 import assert from 'assert';
-import path from 'path';
-import url from 'url';
-import isVersion from 'is-version';
-import Pinkie from 'pinkie-promise';
-import getLines from '../lib/getLines.cjs';
-
 // @ts-ignore
 import eachPackage from 'each-package';
+import isVersion from 'is-version';
+import path from 'path';
+import Pinkie from 'pinkie-promise';
+import url from 'url';
+import getLines from '../lib/getLines.cjs';
+
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 
