@@ -33,8 +33,8 @@
   "scripts": {
     "build": "tsds build",
     "format": "biome check --write --unsafe",
-    "test": "tsds test:node --no-timeouts",
-    "test:engines": "nvu engines npm test",
+    "test": "mocha --no-timeouts test/**/*.test.*",
+    "test:engines": "nvu engines tsds test:node --no-timeouts",
     "version": "tsds version"
   },
   "dependencies": {
@@ -46,7 +46,7 @@
     "queue-cb": "^1.5.3",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.0.42",
-    "spawn-term": "^0.2.10",
+    "spawn-term": "^1.0.2",
     "topological-sort-group": "^0.1.19"
   },
   "devDependencies": {
