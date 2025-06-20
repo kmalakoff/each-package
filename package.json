@@ -25,7 +25,7 @@
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.cts",
   "bin": {
-    "ep": "./bin/cli.cjs"
+    "ep": "./bin/cli"
   },
   "files": [
     "dist"
@@ -46,7 +46,7 @@
     "queue-cb": "^1.5.3",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.0.42",
-    "spawn-term": "^1.0.2",
+    "spawn-term": "^1.0.3",
     "topological-sort-group": "^0.1.19"
   },
   "devDependencies": {
