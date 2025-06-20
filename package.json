@@ -25,7 +25,7 @@
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.cts",
   "bin": {
-    "ep": "./bin/cli"
+    "ep": "./bin/cli.js"
   },
   "files": [
     "dist"

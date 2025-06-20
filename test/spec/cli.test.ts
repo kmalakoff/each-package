@@ -5,7 +5,7 @@ import path from 'path';
 import url from 'url';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
-const CLI = path.join(__dirname, '..', '..', 'bin', 'cli');
+const CLI = path.join(__dirname, '..', '..', 'bin', 'cli.js');
 const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 
 const isWindows = process.platform === 'win32' || /^(msys|cygwin)$/.test(process.env.OSTYPE);
