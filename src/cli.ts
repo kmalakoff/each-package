@@ -3,7 +3,7 @@
 import exit from 'exit';
 import getopts from 'getopts-compat';
 import spawnTerm, { figures, formatArguments } from 'spawn-term';
-import run from './index';
+import run from './index.js';
 
 const ERROR_CODE = 5;
 
