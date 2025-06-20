@@ -18,11 +18,10 @@ jobs:
           node-version: 24
       - run: git config --global user.name "Github Actions"
       - run: git config --global user.email "actions@users.noreply.github.com"
-      - run: npm install ts-dev-stack node-version-use depcheck @biomejs/biome -g -f
+      - run: npm install ts-dev-stack node-version-use depcheck @biomejs/biome mocha -g -f
       - run: depcheck
       - run: npm ci
       - run: npm run build
       - run: tsds validate
       - run: npm run test
-      - run: nvu 24 npm run test
       - run: npm run test:engines
