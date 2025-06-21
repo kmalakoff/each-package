@@ -3,10 +3,11 @@ import path from 'path';
 import Queue from 'queue-cb';
 import spawnStreaming from 'spawn-streaming';
 import spawnTerm from 'spawn-term';
-import packageLayers from './lib/packageLayers.js';
-import type { SpawnError } from './types.js';
+import packageLayers from './lib/packageLayers.ts';
 
-export default function worker(command, args, options, callback) {
+import type { EachCallback, EachError, EachOptions } from './types.ts';
+
+export default function worker(command: string, args: string[], options: EachOptions, callback: EachCallback): undefined {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const concurrency = typeof options.concurrency === 'undefined' ? 1 : options.concurrency;
@@ -44,7 +45,7 @@ export default function worker(command, args, options, callback) {
     }
 
     processLayers(layers, (err) => {
-      if (err) (err as SpawnError).results = results;
+      if (err) (err as EachError).results = results;
       err ? callback(err) : callback(null, results);
     });
   });

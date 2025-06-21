@@ -1,11 +1,11 @@
-#!/usr/bin/env node
-
 import exit from 'exit';
 import getopts from 'getopts-compat';
 import spawnTerm, { figures, formatArguments } from 'spawn-term';
-import run from './index.js';
+import run from './index.ts';
 
 const ERROR_CODE = 5;
+
+import type { EachError, EachOptions, EachResult } from './types.ts';
 
 export default (argv, name) => {
   const options = getopts(argv, {
@@ -22,7 +22,7 @@ export default (argv, name) => {
   }
 
   options.stdio = 'inherit'; // pass through stdio
-  return run(args[0], args.slice(1), options, (err, results) => {
+  return run(args[0], args.slice(1), options as EachOptions, (err?: EachError, results?: EachResult[]): undefined => {
     if (err && !err.results) {
       console.log(err.message);
       return exit(ERROR_CODE);
