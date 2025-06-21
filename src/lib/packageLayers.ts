@@ -9,12 +9,16 @@ interface PackageEntry extends Entry {
   package: { name: string; dependencies: object; optionalDependencies: object };
 }
 
-export default function packageLayers(options, callback) {
+import type { EachOptions } from '../types.ts';
+
+export type Callback = (err?: Error, node?: PackageEntry[][]) => undefined;
+
+export default function packageLayers(options: EachOptions, callback: Callback): undefined {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const cwd = options.cwd || process.cwd();
 
-  const iterator = new Iterator(cwd, {
+  const iterator = new Iterator(cwd as string, {
     filter: function filter(entry) {
       if (entry.stats.isDirectory()) return entry.basename[0] !== '.' && entry.basename !== 'node_modules';
       if (entry.stats.isFile()) return entry.basename === 'package.json';
@@ -44,7 +48,7 @@ export default function packageLayers(options, callback) {
 
       // full graph at one layer, sorted by relative path
       if (!options.topological) {
-        const sorted = entries.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path)));
+        const sorted = entries.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path))) as PackageEntry[];
         return callback(null, [sorted]);
       }
 
@@ -62,7 +66,7 @@ export default function packageLayers(options, callback) {
 
       const { nodes, cycles } = sort(graph);
       if (cycles && cycles.length) cycles.forEach((c) => console.log(`Skipping cycle: ${c.join(' -> ')}`));
-      return callback(null, nodes);
+      return callback(null, nodes as unknown as PackageEntry[][]);
     }
   );
 }

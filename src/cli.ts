@@ -7,7 +7,7 @@ const ERROR_CODE = 5;
 
 import type { EachError, EachOptions, EachResult } from './types.ts';
 
-export default (argv, name) => {
+export default (argv: string[], name: string): undefined => {
   const options = getopts(argv, {
     alias: { depth: 'd', concurrency: 'c', topological: 't', expanded: 'e', streaming: 's', silent: 'si', private: 'p' },
     boolean: ['topological', 'expanded', 'streaming', 'silent', 'private'],
