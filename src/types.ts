@@ -18,6 +18,8 @@ export interface EachOptions extends SpawnOptions {
   streaming?: boolean;
   expanded?: boolean;
   depth?: number;
+  private?: boolean;
+  topological?: boolean;
 }
 
 export type EachCallback = (err?: EachError, results?: EachResult[]) => undefined;
