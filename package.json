@@ -38,7 +38,7 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "^2.3.2",
+    "cross-spawn-cb": "^2.3.3",
     "exit": "^0.1.2",
     "fs-iterator": "^6.0.3",
     "getopts-compat": "^2.2.6",
@@ -46,7 +46,7 @@
     "queue-cb": "^1.5.5",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.0.45",
-    "spawn-term": "^1.0.11",
+    "spawn-term": "^1.0.12",
     "topological-sort-group": "^0.1.21"
   },
   "devDependencies": {
