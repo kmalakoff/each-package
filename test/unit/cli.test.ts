@@ -17,7 +17,10 @@ describe('cli', () => {
   describe('happy path', () => {
     it('basic command', (done) => {
       spawn(CLI, ['--silent', '--expanded', 'echo', '"hello"'], { encoding: 'utf8', cwd: path.join(NODE_MODULES, '@types') }, (err, res) => {
-        if (err) return done(err.message);
+        if (err) {
+          done(err.message);
+          return;
+        }
         assert.ok(res.stdout.indexOf('"hello"') >= 0);
         done();
       });
@@ -25,7 +28,10 @@ describe('cli', () => {
 
     it('basic command with options', (done) => {
       spawn(CLI, ['--silent', '--expanded', NODE, '--version'], { encoding: 'utf8', cwd: path.join(NODE_MODULES, '@types') }, (err, res) => {
-        if (err) return done(err.message);
+        if (err) {
+          done(err.message);
+          return;
+        }
         assert.ok(res.stdout.indexOf(VERSION) >= 0);
         done();
       });
