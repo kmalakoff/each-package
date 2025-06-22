@@ -5,7 +5,7 @@ import isVersion from 'is-version';
 import path from 'path';
 import Pinkie from 'pinkie-promise';
 import url from 'url';
-import getLines from '../lib/getLines.cjs';
+import getLines from '../lib/getLines.ts';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
@@ -29,14 +29,20 @@ describe('library', () => {
   describe('happy path', () => {
     it('basic command', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', cwd: path.join(NODE_MODULES, '@types') }, (err, results) => {
-        if (err) return done(err.message);
+        if (err) {
+          done(err.message);
+          return;
+        }
         assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });
     });
     it('basic command (concurrency 10)', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', concurrency: 2, cwd: path.join(NODE_MODULES, '@types') }, (err, results) => {
-        if (err) return done(err.message);
+        if (err) {
+          done(err.message);
+          return;
+        }
         assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });

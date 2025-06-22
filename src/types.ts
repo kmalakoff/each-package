@@ -20,6 +20,7 @@ export interface EachOptions extends SpawnOptions {
   depth?: number;
   private?: boolean;
   topological?: boolean;
+  silent?: boolean;
 }
 
 export type EachCallback = (err?: EachError, results?: EachResult[]) => undefined;
