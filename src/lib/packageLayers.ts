@@ -52,7 +52,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         return callback(null, [sorted]);
       }
 
-      const graph = new Graph({ path: 'package.name' });
+      const graph = new Graph<PackageEntry>({ path: 'package.name' });
       entries.forEach((entry) => graph.add(entry));
 
       // build graph edges from dependencies and optionalDependencies
