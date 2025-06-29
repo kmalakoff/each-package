@@ -6,7 +6,7 @@ import removeBOM from 'remove-bom-buffer';
 import { Graph, sort } from 'topological-sort-group';
 
 interface PackageEntry extends Entry {
-  contents: { name: string; dependencies: object; optionalDependencies: object };
+  package: { name: string; dependencies: object; optionalDependencies: object };
 }
 
 import type { EachOptions } from '../types.ts';
@@ -37,7 +37,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         if (err) return cb(err);
         const pkg = JSON.parse(removeBOM(contents));
         if (pkg.private && !options.private) return cb();
-        entry.contents = pkg;
+        entry.package = pkg;
         entries.push(entry);
         cb();
       });
@@ -52,15 +52,15 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         return callback(null, [sorted]);
       }
 
-      const graph = new Graph<PackageEntry>({ path: 'contents.name' });
+      const graph = new Graph<PackageEntry>({ path: 'package.name' });
       entries.forEach((entry) => graph.add(entry));
 
       // build graph edges from dependencies and optionalDependencies
       entries.forEach((entry: PackageEntry) => {
-        const deps = { ...(entry.contents.dependencies || {}), ...(entry.contents.optionalDependencies || {}) };
+        const deps = { ...(entry.package.dependencies || {}), ...(entry.package.optionalDependencies || {}) };
         for (const name in deps) {
           const found = find(entries, (x) => x.package.name === name); // dependency in graph
-          if (found) graph.add(name, entry.contents.name);
+          if (found) graph.add(name, entry.package.name);
         }
       });
 
