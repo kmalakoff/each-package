@@ -6,7 +6,7 @@ import removeBOM from 'remove-bom-buffer';
 import { Graph, sort } from 'topological-sort-group';
 
 interface PackageEntry extends Entry {
-  package: { name: string; dependencies: object; optionalDependencies: object };
+  contents: { name: string; dependencies: object; optionalDependencies: object };
 }
 
 import type { EachOptions } from '../types.ts';
@@ -37,7 +37,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         if (err) return cb(err);
         const pkg = JSON.parse(removeBOM(contents));
         if (pkg.private && !options.private) return cb();
-        entry.package = pkg;
+        entry.contents = pkg;
         entries.push(entry);
         cb();
       });
@@ -57,10 +57,10 @@ export default function packageLayers(options: EachOptions, callback: Callback):
 
       // build graph edges from dependencies and optionalDependencies
       entries.forEach((entry: PackageEntry) => {
-        const deps = { ...(entry.package.dependencies || {}), ...(entry.package.optionalDependencies || {}) };
+        const deps = { ...(entry.contents.dependencies || {}), ...(entry.contents.optionalDependencies || {}) };
         for (const name in deps) {
           const found = find(entries, (x) => x.package.name === name); // dependency in graph
-          if (found) graph.add(name, entry.package.name);
+          if (found) graph.add(name, entry.contents.name);
         }
       });
 
