@@ -1,6 +1,6 @@
 {
   "name": "each-package",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Run commands in each package folder starting with cwd skipping node_modules folders",
   "keywords": [
     "each",
