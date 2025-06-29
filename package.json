@@ -46,7 +46,7 @@
     "queue-cb": "^1.5.5",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.0.52",
-    "spawn-term": "^1.0.16",
+    "spawn-term": "^1.0.17",
     "topological-sort-group": "^0.1.24"
   },
   "devDependencies": {
