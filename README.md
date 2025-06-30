@@ -19,5 +19,5 @@ $ ep -t npm deploy
 $ ep -p npm test
 
 # custom ignore - default is node_modules,.git
-$ ep -ignore=node_modules,.yarn,my-symlink-cycle npm test
+$ ep --ignore=node_modules,.git,.yarn,my-symlink-cycle npm test
 ```
