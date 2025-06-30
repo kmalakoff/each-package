@@ -9,7 +9,7 @@ import type { EachError, EachOptions, EachResult } from './types.ts';
 
 export default (argv: string[], name: string): undefined => {
   const options = getopts(argv, {
-    alias: { depth: 'd', concurrency: 'c', topological: 't', expanded: 'e', streaming: 's', silent: 'si', private: 'p' },
+    alias: { depth: 'd', concurrency: 'c', topological: 't', expanded: 'e', streaming: 's', silent: 'si', private: 'p', ignore: 'i' },
     boolean: ['topological', 'expanded', 'streaming', 'silent', 'private'],
     default: { depth: Infinity, concurrency: Infinity },
     stopEarly: true,

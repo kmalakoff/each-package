@@ -15,12 +15,13 @@ export interface EachError extends Error {
 
 export interface EachOptions extends SpawnOptions {
   concurrency?: number;
-  streaming?: boolean;
-  expanded?: boolean;
   depth?: number;
+  expanded?: boolean;
+  ignore?: string;
   private?: boolean;
-  topological?: boolean;
   silent?: boolean;
+  streaming?: boolean;
+  topological?: boolean;
 }
 
 export type EachCallback = (err?: EachError, results?: EachResult[]) => undefined;
