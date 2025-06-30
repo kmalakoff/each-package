@@ -48,7 +48,7 @@
     "spawn-streaming": "^1.1.1",
     "spawn-term": "^1.1.1",
     "topological-sort-group": "^2.0.2",
-    "ts-swc-transform": "^2.5.2"
+    "ts-swc-transform": "^2.5.3"
   },
   "devDependencies": {
     "@types/mocha": "*",
