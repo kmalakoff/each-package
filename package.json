@@ -40,14 +40,15 @@
   "dependencies": {
     "cross-spawn-cb": "^2.4.1",
     "exit": "^0.1.2",
-    "fs-iterator": "^6.1.1",
+    "fs-iterator": "^6.1.2",
     "getopts-compat": "^2.2.6",
     "lodash.find": "^4.6.0",
     "queue-cb": "^1.5.5",
     "remove-bom-buffer": "^3.0.0",
-    "spawn-streaming": "^1.1.0",
-    "spawn-term": "^1.1.0",
-    "topological-sort-group": "^1.1.0"
+    "spawn-streaming": "^1.1.1",
+    "spawn-term": "^1.1.1",
+    "topological-sort-group": "^2.0.2",
+    "ts-swc-transform": "^2.5.2"
   },
   "devDependencies": {
     "@types/mocha": "*",
