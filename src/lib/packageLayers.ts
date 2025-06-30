@@ -3,7 +3,8 @@ import Iterator, { type Entry } from 'fs-iterator';
 import find from 'lodash.find';
 import path from 'path';
 import removeBOM from 'remove-bom-buffer';
-import { Graph, sort } from 'topological-sort-group';
+import Graph from 'topological-sort-group';
+import { createMatcher } from 'ts-swc-transform';
 
 interface PackageEntry extends Entry {
   package: { name: string; dependencies: object; optionalDependencies: object };
@@ -13,19 +14,25 @@ import type { EachOptions } from '../types.ts';
 
 export type Callback = (err?: Error, node?: PackageEntry[][]) => undefined;
 
+const defaultIgnores = 'node_modules,.git';
+
 export default function packageLayers(options: EachOptions, callback: Callback): undefined {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
+
   const cwd = options.cwd || process.cwd();
+
+  const ignores = options.ignore ? options.ignore : defaultIgnores;
+  const matcher = createMatcher({ path: '.', config: { exclude: ignores.split(',') } });
 
   const iterator = new Iterator(cwd as string, {
     filter: function filter(entry) {
-      if (entry.stats.isDirectory()) return entry.basename[0] !== '.' && entry.basename !== 'node_modules';
+      if (entry.stats.isDirectory() || entry.realStats?.isDirectory()) return entry.basename[0] !== '.' && matcher(entry.basename);
       if (entry.stats.isFile()) return entry.basename === 'package.json';
     },
     depth,
+    lstat: true,
   });
-
   const entries = [];
   iterator.forEach(
     (entry: PackageEntry, cb): undefined => {
@@ -37,6 +44,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         if (err) return cb(err);
         const pkg = JSON.parse(removeBOM(contents));
         if (pkg.private && !options.private) return cb();
+        if (pkg.name === undefined) return cb(); // skip packages without names
         entry.package = pkg;
         entries.push(entry);
         cb();
@@ -64,7 +72,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         }
       });
 
-      const { nodes, cycles } = sort(graph);
+      const { nodes, cycles } = graph.sort();
       if (cycles && cycles.length) cycles.forEach((c) => console.log(`Skipping cycle: ${c.join(' -> ')}`));
       return callback(null, nodes as unknown as PackageEntry[][]);
     }
