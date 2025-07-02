@@ -3,8 +3,8 @@ import Iterator, { type Entry } from 'fs-iterator';
 import find from 'lodash.find';
 import path from 'path';
 import removeBOM from 'remove-bom-buffer';
+import match from 'test-match';
 import Graph from 'topological-sort-group';
-import { createMatcher } from 'ts-swc-transform';
 
 interface PackageEntry extends Entry {
   package: { name: string; dependencies: object; optionalDependencies: object };
@@ -23,7 +23,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
   const cwd = options.cwd || process.cwd();
 
   const ignores = options.ignore ? options.ignore : defaultIgnores;
-  const matcher = createMatcher({ path: '.', config: { exclude: ignores.split(',') } });
+  const matcher = match({ exclude: ignores });
 
   const iterator = new Iterator(cwd as string, {
     filter: function filter(entry) {
