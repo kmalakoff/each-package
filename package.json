@@ -47,7 +47,7 @@
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.1.1",
     "spawn-term": "^1.1.1",
-    "test-match": "^0.1.0",
+    "test-match": "^1.0.1",
     "topological-sort-group": "^2.0.2"
   },
   "devDependencies": {
