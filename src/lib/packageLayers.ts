@@ -42,12 +42,17 @@ export default function packageLayers(options: EachOptions, callback: Callback):
       }
       fs.readFile(entry.fullPath, 'utf8', (err, contents) => {
         if (err) return cb(err);
-        const pkg = JSON.parse(removeBOM(contents));
-        if (pkg.private && !options.private) return cb();
-        if (pkg.name === undefined) return cb(); // skip packages without names
-        entry.package = pkg;
-        entries.push(entry);
-        cb();
+        try {
+          const pkg = JSON.parse(removeBOM(contents));
+          if (pkg.private && !options.private) return cb();
+          if (pkg.name === undefined) return cb(); // skip packages without names
+          entry.package = pkg;
+          entries.push(entry);
+          cb();
+        } catch (_err) {
+          console.log(`Failed to parse JSON for ${entry.path}`);
+          cb();
+        }
       });
     },
     { concurrency: Infinity, callbacks: true },
