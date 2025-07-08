@@ -38,17 +38,17 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "^2.4.2",
-    "exit": "^0.1.2",
-    "fs-iterator": "^6.1.2",
-    "getopts-compat": "^2.2.6",
-    "lodash.find": "^4.6.0",
-    "queue-cb": "^1.5.5",
-    "remove-bom-buffer": "^3.0.0",
-    "spawn-streaming": "^1.1.2",
-    "spawn-term": "^1.1.2",
-    "test-match": "^1.0.1",
-    "topological-sort-group": "^2.0.3"
+    "cross-spawn-cb": "*",
+    "exit": "*",
+    "fs-iterator": "*",
+    "getopts-compat": "*",
+    "lodash.find": "*",
+    "queue-cb": "*",
+    "remove-bom-buffer": "*",
+    "spawn-streaming": "*",
+    "spawn-term": "*",
+    "test-match": "*",
+    "topological-sort-group": "*"
   },
   "devDependencies": {
     "@types/mocha": "*",
