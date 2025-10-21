@@ -1,5 +1,4 @@
 import assert from 'assert';
-// @ts-ignore
 import eachPackage from 'each-package';
 import isVersion from 'is-version';
 import path from 'path';
