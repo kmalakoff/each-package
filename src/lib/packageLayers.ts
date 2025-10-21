@@ -66,7 +66,9 @@ export default function packageLayers(options: EachOptions, callback: Callback):
       }
 
       const graph = new Graph<PackageEntry>({ path: 'package.name' });
-      entries.forEach((entry) => graph.add(entry));
+      entries.forEach((entry) => {
+        graph.add(entry);
+      });
 
       // build graph edges from dependencies and optionalDependencies
       entries.forEach((entry: PackageEntry) => {
@@ -78,7 +80,10 @@ export default function packageLayers(options: EachOptions, callback: Callback):
       });
 
       const { nodes, cycles } = graph.sort();
-      if (cycles && cycles.length) cycles.forEach((c) => console.log(`Skipping cycle: ${c.join(' -> ')}`));
+      if (cycles && cycles.length)
+        cycles.forEach((c) => {
+          console.log(`Skipping cycle: ${c.join(' -> ')}`);
+        });
       return callback(null, nodes as unknown as PackageEntry[][]);
     }
   );
