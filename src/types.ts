@@ -19,6 +19,7 @@ export interface EachOptions extends SpawnOptions {
   expanded?: boolean;
   ignore?: string;
   private?: boolean;
+  root?: boolean;
   silent?: boolean;
   streaming?: boolean;
   topological?: boolean;

@@ -1,0 +1,6 @@
+{
+  "name": "fixture-root",
+  "version": "1.0.0",
+  "description": "Test fixture for root package",
+  "private": true
+}
