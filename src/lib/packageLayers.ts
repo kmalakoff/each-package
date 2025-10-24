@@ -28,7 +28,14 @@ export default function packageLayers(options: EachOptions, callback: Callback):
   const iterator = new Iterator(cwd as string, {
     filter: function filter(entry) {
       if (entry.stats.isDirectory() || entry.realStats?.isDirectory()) return entry.basename[0] !== '.' && matcher(entry.basename);
-      if (entry.stats.isFile()) return entry.basename === 'package.json';
+      if (entry.stats.isFile()) {
+        // Only include package.json files
+        if (entry.basename !== 'package.json') return false;
+        // Exclude root package.json unless --root flag is set
+        if (!options.root && entry.path === 'package.json') return false;
+        return true;
+      }
+      return false;
     },
     depth,
     lstat: true,

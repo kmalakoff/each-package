@@ -1,0 +1,6 @@
+{
+  "name": "fixture-pkg-a",
+  "version": "1.0.0",
+  "description": "Test fixture package A",
+  "private": true
+}
