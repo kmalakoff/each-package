@@ -1,5 +1,4 @@
 import assert from 'assert';
-import cr from 'cr';
 import spawn from 'cross-spawn-cb';
 import path from 'path';
 import url from 'url';
@@ -10,7 +9,6 @@ const CLI = path.join(__dirname, '..', '..', 'bin', 'cli.js');
 const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 const ROOT = path.join(__dirname, '..', '..');
 const FIXTURE_ROOT = path.join(__dirname, '..', 'fixtures', 'root');
-
 
 describe('cli', () => {
   describe('basic command', () => {
