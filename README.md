@@ -18,6 +18,9 @@ $ ep -t npm deploy
 # one at a time (default private: false)
 $ ep -p npm test
 
+# include the root package.json if it exists (default root: false)
+$ ep -r npm test
+
 # custom ignore - default is node_modules,.git
 $ ep --ignore=node_modules,.git,.yarn,my-symlink-cycle npm test
 ```

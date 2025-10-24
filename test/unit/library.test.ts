@@ -9,6 +9,7 @@ import getLines from '../lib/getLines.ts';
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 const ROOT = path.join(__dirname, '..', '..');
+const FIXTURE_ROOT = path.join(__dirname, '..', 'fixtures', 'root');
 
 const isWindows = process.platform === 'win32' || /^(msys|cygwin)$/.test(process.env.OSTYPE);
 const NODE = isWindows ? 'node.exe' : 'node';
@@ -33,8 +34,7 @@ describe('library', () => {
           done(err.message);
           return;
         }
-        assert.equal(results.length, 1);
-        assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
+        assert.equal(results.length, 0); // root excluded by default
         done();
       });
     });
@@ -65,8 +65,7 @@ describe('library', () => {
           done(err.message);
           return;
         }
-        assert.equal(results.length, 1);
-        assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
+        assert.equal(results.length, 0); // root excluded by default
         done();
       });
     });
@@ -91,8 +90,7 @@ describe('library', () => {
           done(err.message);
           return;
         }
-        assert.equal(results.length, 1);
-        assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
+        assert.equal(results.length, 0); // root excluded by default
         done();
       });
     });
@@ -131,6 +129,50 @@ describe('library', () => {
         assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });
+    });
+  });
+
+  describe('root option', () => {
+    it('with root: false (should exclude root package)', (done) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', root: false, private: true, cwd: FIXTURE_ROOT }, (err, results) => {
+        if (err) {
+          done(err.message);
+          return;
+        }
+        assert.equal(results.length, 2); // pkg-a and pkg-b only
+        assert.ok(!results.some((r) => r.path === '.'));
+        done();
+      });
+    });
+
+    it('with root: true (should include root package)', (done) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', root: true, private: true, cwd: FIXTURE_ROOT }, (err, results) => {
+        if (err) {
+          done(err.message);
+          return;
+        }
+        assert.equal(results.length, 3); // root, pkg-a, and pkg-b
+        assert.ok(results.some((r) => r.path === '.'));
+        done();
+      });
+    });
+
+    it('with root: true and topological (should include root in dependency graph)', (done) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', root: true, private: true, topological: true, cwd: FIXTURE_ROOT }, (err, results) => {
+        if (err) {
+          done(err.message);
+          return;
+        }
+        assert.equal(results.length, 3); // root, pkg-a, and pkg-b
+        assert.ok(results.some((r) => r.path === '.'));
+        done();
+      });
+    });
+
+    it('with root: true (promises)', async () => {
+      const results = await eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', root: true, private: true, cwd: FIXTURE_ROOT });
+      assert.equal(results.length, 3); // root, pkg-a, and pkg-b
+      assert.ok(results.some((r) => r.path === '.'));
     });
   });
 });

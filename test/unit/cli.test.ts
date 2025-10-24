@@ -9,11 +9,8 @@ const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : 
 const CLI = path.join(__dirname, '..', '..', 'bin', 'cli.js');
 const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 const ROOT = path.join(__dirname, '..', '..');
+const FIXTURE_ROOT = path.join(__dirname, '..', 'fixtures', 'root');
 
-const isWindows = process.platform === 'win32' || /^(msys|cygwin)$/.test(process.env.OSTYPE);
-const NODE = isWindows ? 'node.exe' : 'node';
-const res = spawn.sync(NODE, ['--version'], { encoding: 'utf8' });
-const _VERSION = cr(res.stdout).split('\n')[0];
 
 describe('cli', () => {
   describe('basic command', () => {
@@ -25,7 +22,7 @@ describe('cli', () => {
         }
 
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
-        assert.equal(results.length, 1);
+        assert.equal(results.length, 0); // root excluded by default
         done();
       });
     });
@@ -51,7 +48,7 @@ describe('cli', () => {
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
-        assert.equal(results.length, 1);
+        assert.equal(results.length, 0); // root excluded by default
         done();
       });
     });
@@ -77,7 +74,7 @@ describe('cli', () => {
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
-        assert.equal(results.length, 1);
+        assert.equal(results.length, 0); // root excluded by default
         done();
       });
     });
@@ -114,6 +111,44 @@ describe('cli', () => {
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
         assert.ok(results.length > 50);
+        done();
+      });
+    });
+  });
+
+  describe('root flag', () => {
+    it('without --root flag (should exclude root package)', (done) => {
+      spawn(CLI, ['--silent', '--expanded', '--streaming', '--private', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_ROOT }, (err, res) => {
+        if (err) {
+          done(err.message);
+          return;
+        }
+        const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
+        assert.equal(results.length, 2); // pkg-a and pkg-b only
+        done();
+      });
+    });
+
+    it('with --root flag (should include root package)', (done) => {
+      spawn(CLI, ['--silent', '--expanded', '--streaming', '--private', '--root', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_ROOT }, (err, res) => {
+        if (err) {
+          done(err.message);
+          return;
+        }
+        const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
+        assert.equal(results.length, 3); // root, pkg-a, and pkg-b
+        done();
+      });
+    });
+
+    it('with -r flag (should include root package)', (done) => {
+      spawn(CLI, ['--silent', '--expanded', '--streaming', '--private', '-r', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_ROOT }, (err, res) => {
+        if (err) {
+          done(err.message);
+          return;
+        }
+        const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
+        assert.equal(results.length, 3); // root, pkg-a, and pkg-b
         done();
       });
     });
