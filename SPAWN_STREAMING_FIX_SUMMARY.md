@@ -17,7 +17,8 @@ On Windows Node 0.8/0.10, when streams are piped, **the child process 'close' ev
 ## The Fix
 
 **Repository:** `/home/user/spawn-streaming`
-**Branch:** `fix/windows-node-0.8-stdio-inherit`
+**Branch:** `master`
+**Commit:** `9847d14`
 **File:** `src/worker.ts`
 
 Changed:
@@ -25,47 +26,43 @@ Changed:
 // BEFORE - doesn't wait for pipes when stdio='inherit'
 if (stdio === 'inherit') pipeline(cp.stdout, process.stdout, options, color);
 
-// AFTER - waits for pipes to finish
+// AFTER - waits for source streams (cp.stdout/stderr) to finish
 if (stdio === 'inherit') {
-  const stdoutPipe = pipeline(cp.stdout, process.stdout, options, color);
-  queue.defer(oo.bind(null, stdoutPipe, ['error', 'end', 'close', 'finish']));
+  pipeline(cp.stdout, process.stdout, options, color);
+  // Wait for source stream to end - needed for Windows Node 0.8/0.10
+  queue.defer(oo.bind(null, cp.stdout, ['error', 'end', 'close']));
 }
 ```
 
 Now the queue waits for:
-1. ✅ stdout pipe to finish ('error', 'end', 'close', or 'finish')
-2. ✅ stderr pipe to finish (same events)
+1. ✅ cp.stdout source stream to finish ('error', 'end', or 'close')
+2. ✅ cp.stderr source stream to finish (same events)
 3. ✅ child process to close (via cross-spawn-cb.worker)
 
 ## Why This Works
 
-Even though the child process 'close' event doesn't fire on Windows Node 0.8/0.10, **the destination stream (process.stdout/stderr) DOES fire 'finish' or 'close' events** when the pipe completes.
+Even though the child process 'close' event doesn't fire on Windows Node 0.8/0.10, **the source streams (cp.stdout/stderr) DO fire 'end' or 'close' events** when they finish writing data.
 
-By waiting for the piped streams to finish, we no longer rely solely on the child process 'close' event.
+By waiting for the source streams to finish, we no longer rely solely on the child process 'close' event. Note: We wait for cp.stdout/stderr (source), NOT process.stdout/stderr (destination), because the destination streams don't emit 'end' events.
 
 ## Next Steps to Deploy
 
-1. **Push spawn-streaming fix:**
+1. **Publish new spawn-streaming version:**
+   The fix is committed locally at `/home/user/spawn-streaming` (commit 9847d14).
+   You need to push and publish it:
    ```bash
    cd /home/user/spawn-streaming
-   git push -u origin fix/windows-node-0.8-stdio-inherit
-   ```
-
-2. **Create PR or merge to master in spawn-streaming**
-
-3. **Publish new spawn-streaming version:**
-   ```bash
-   cd /home/user/spawn-streaming
+   git push origin master
    npm version patch  # or minor/major
    npm publish
    ```
 
-4. **Update each-package to use new spawn-streaming:**
+2. **Update each-package to use new spawn-streaming:**
    ```bash
    cd /home/user/each-package
    npm update spawn-streaming
    git add package-lock.json
-   git commit -m "Update spawn-streaming to fix Windows Node 0.8/0.10 hang"
+   git commit -m "Update spawn-streaming with Windows Node 0.8/0.10 fix"
    git push
    ```
 
@@ -99,4 +96,8 @@ But there was a **second, independent bug** in spawn-streaming that caused the s
 
 ---
 
-**Status:** Fix is committed and ready to publish. Awaiting your approval to push to spawn-streaming repo.
+**Status:**
+- ✅ Fix is committed to `/home/user/spawn-streaming` (commit 9847d14)
+- ✅ All spawn-streaming tests pass locally (8 tests)
+- ✅ All each-package tests pass with the fix (26 tests, including sustained output test in 5.2s)
+- ⏳ Ready for you to push spawn-streaming to GitHub and publish to npm
