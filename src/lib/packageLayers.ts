@@ -86,10 +86,14 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         }
       });
 
-      const { nodes, cycles } = graph.sort();
+      const { nodes, cycles, duplicates } = graph.sort();
       if (cycles && cycles.length)
         cycles.forEach((c) => {
           console.log(`Skipping cycle: ${c.join(' -> ')}`);
+        });
+      if (duplicates && duplicates.length)
+        duplicates.forEach((d) => {
+          console.log(`Skipping duplicate: ${d}`);
         });
       return callback(null, nodes as unknown as PackageEntry[][]);
     }
