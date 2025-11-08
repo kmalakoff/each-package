@@ -1,0 +1,7 @@
+{
+  "name": "fixture-multiple-packages",
+  "version": "1.0.0",
+  "description": "Test fixture for multiple package discovery",
+  "private": true,
+  "workspaces": ["packages/*", "@scoped/*"]
+}
