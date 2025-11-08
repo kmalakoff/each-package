@@ -7,9 +7,11 @@ import url from 'url';
 import getLines from '../lib/getLines.ts';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
-const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
-const ROOT = path.join(__dirname, '..', '..');
+const _NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
+const _ROOT = path.join(__dirname, '..', '..');
 const FIXTURE_ROOT = path.join(__dirname, '..', 'fixtures', 'root');
+const FIXTURE_SINGLE = path.join(__dirname, '..', 'fixtures', 'single-package');
+const FIXTURE_MULTIPLE = path.join(__dirname, '..', 'fixtures', 'multiple-packages');
 
 const isWindows = process.platform === 'win32' || /^(msys|cygwin)$/.test(process.env.OSTYPE);
 const NODE = isWindows ? 'node.exe' : 'node';
@@ -29,7 +31,7 @@ describe('library', () => {
 
   describe('basic command', () => {
     it('root', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', cwd: ROOT }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', cwd: FIXTURE_SINGLE }, (err, results) => {
         if (err) {
           done(err.message);
           return;
@@ -40,7 +42,7 @@ describe('library', () => {
     });
 
     it('node_modules/@types', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', cwd: path.join(NODE_MODULES, '@types') }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, cwd: path.join(FIXTURE_MULTIPLE, '@scoped') }, (err, results) => {
         if (err) {
           done(err.message);
           return;
@@ -52,7 +54,7 @@ describe('library', () => {
     });
 
     it('node_modules/@types (promises)', async () => {
-      const results = await eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', cwd: path.join(NODE_MODULES, '@types') });
+      const results = await eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, cwd: path.join(FIXTURE_MULTIPLE, '@scoped') });
       assert.equal(results.length, 2);
       assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
     });
@@ -60,7 +62,7 @@ describe('library', () => {
 
   describe('concurrency', () => {
     it('root concurrency=10', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', concurrency: 10, cwd: ROOT }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', concurrency: 10, cwd: FIXTURE_SINGLE }, (err, results) => {
         if (err) {
           done(err.message);
           return;
@@ -71,7 +73,7 @@ describe('library', () => {
     });
 
     it('node_modules/@types concurrency=10', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', concurrency: 10, cwd: path.join(NODE_MODULES, '@types') }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', concurrency: 10, private: true, cwd: path.join(FIXTURE_MULTIPLE, '@scoped') }, (err, results) => {
         if (err) {
           done(err.message);
           return;
@@ -85,7 +87,7 @@ describe('library', () => {
 
   describe('custom ignore', () => {
     it('root ignore=node_modules', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: 'node_modules', cwd: ROOT }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: 'node_modules', cwd: FIXTURE_SINGLE }, (err, results) => {
         if (err) {
           done(err.message);
           return;
@@ -96,19 +98,19 @@ describe('library', () => {
     });
 
     it('root ignore=each-package,each-package.*', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: 'each-package,each-package.*', concurrency: 100, cwd: ROOT }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: '*mocha*', concurrency: 100, private: true, cwd: path.join(FIXTURE_MULTIPLE, 'packages') }, (err, results) => {
         if (err) {
           done(err.message);
           return;
         }
-        assert.ok(results.length > 50);
+        assert.equal(results.length, 4);
         assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });
     });
 
     it('node_modules/@types ignore=mocha', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: 'mocha', cwd: path.join(NODE_MODULES, '@types') }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: 'pkg-x', private: true, cwd: path.join(FIXTURE_MULTIPLE, '@scoped') }, (err, results) => {
         if (err) {
           done(err.message);
           return;
@@ -120,12 +122,12 @@ describe('library', () => {
     });
 
     it('node_modules ignore=each-package,each-package.*', (done) => {
-      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: 'each-package,each-package.*', concurrency: 100, cwd: NODE_MODULES }, (err, results) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: '*mocha*', concurrency: 100, private: true, cwd: FIXTURE_MULTIPLE }, (err, results) => {
         if (err) {
           done(err.message);
           return;
         }
-        assert.ok(results.length > 50);
+        assert.equal(results.length, 6);
         assert.ok(isVersion(getLines(results[0].result.stdout).slice(-1)[0], 'v'));
         done();
       });

@@ -1,0 +1,6 @@
+{
+  "name": "fixture-single-package",
+  "version": "1.0.0",
+  "description": "Test fixture for single-package repository (no workspaces)",
+  "private": true
+}
