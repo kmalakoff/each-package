@@ -93,7 +93,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         });
       if (duplicates && duplicates.length)
         duplicates.forEach((d) => {
-          console.log(`Skipping duplicate: ${d}`);
+          console.log(`Skipping duplicates: ${JSON.stringify(d.values.map((x) => x.path))}`);
         });
       return callback(null, nodes as unknown as PackageEntry[][]);
     }
