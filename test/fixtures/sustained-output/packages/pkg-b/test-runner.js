@@ -2,6 +2,8 @@
 // Simulates long-running process with sustained output (like npm test)
 // Produces ~2 seconds of continuous output to expose dual consumption bug
 
+var exit = require('exit');
+
 for (var i = 1; i <= 50; i++) {
   console.log('✓ test ' + i + 'passed (' + Math.floor(Math.random() * 100) + 'ms)');
 
@@ -13,4 +15,4 @@ for (var i = 1; i <= 50; i++) {
 }
 
 console.log('\n✓ 50 tests completed');
-process.exit(0);
+exit(0);

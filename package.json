@@ -43,11 +43,11 @@
     "exit": "*",
     "fs-iterator": "*",
     "getopts-compat": "*",
+    "install-module-linked": "*",
     "lodash.find": "*",
     "queue-cb": "*",
     "remove-bom-buffer": "*",
     "spawn-streaming": "*",
-    "spawn-term": "*",
     "test-match": "*",
     "topological-sort-group": "*"
   },
@@ -56,7 +56,9 @@
     "@types/node": "*",
     "cr": "*",
     "is-version": "*",
-    "pinkie-promise": "*"
+    "node-version-use": "*",
+    "pinkie-promise": "*",
+    "ts-dev-stack": "*"
   },
   "engines": {
     "node": ">=0.8"
