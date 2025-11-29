@@ -11,7 +11,7 @@ export default function worker(command: string, args: string[], options: EachOpt
   // Load spawn-term lazily
   loadSpawnTerm((loadErr, mod) => {
     if (loadErr) return callback(loadErr);
-    const spawnTerm = mod.spawnTerm;
+    const createSession = mod.createSession;
 
     let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
     if (depth !== Infinity) depth++; // depth is relative to first level of packages
@@ -19,6 +19,9 @@ export default function worker(command: string, args: string[], options: EachOpt
 
     packageLayers(options, (err, layers) => {
       if (err) return callback(err);
+
+      // Create session once for all processes
+      const session = createSession && !options.streaming ? createSession({ header: `${process.cwd()}> ${command} ${args.join(' ')}`, showStatusBar: true, interactive: options.interactive }) : null;
 
       const results = [];
       function processLayers(layers, callback) {
@@ -41,7 +44,7 @@ export default function worker(command: string, args: string[], options: EachOpt
               cb();
             }
 
-            if (spawnTerm && !options.streaming) spawnTerm(command, args, spawnOptions, { group: prefix, expanded: options.expanded, header: `${process.cwd()}> ${command} ${args.join(' ')}`, showStatusBar: true }, next);
+            if (session) session.spawn(command, args, spawnOptions, { group: prefix, expanded: options.expanded }, next);
             else spawnStreaming(command, args, spawnOptions, { prefix }, next);
           });
         });
@@ -51,7 +54,13 @@ export default function worker(command: string, args: string[], options: EachOpt
 
       processLayers(layers, (err) => {
         if (err) (err as EachError).results = results;
-        err ? callback(err) : callback(null, results);
+        if (session) {
+          session.waitAndClose(() => {
+            err ? callback(err) : callback(null, results);
+          });
+        } else {
+          err ? callback(err) : callback(null, results);
+        }
       });
     });
   });
