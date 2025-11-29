@@ -21,7 +21,8 @@ export default function worker(command: string, args: string[], options: EachOpt
       if (err) return callback(err);
 
       // Create session once for all processes
-      const session = createSession && !options.streaming ? createSession({ header: `${process.cwd()}> ${command} ${args.join(' ')}`, showStatusBar: true, interactive: options.interactive }) : null;
+      const interactive = options.batch ? false : options.interactive !== false;
+      const session = createSession && !options.streaming ? createSession({ header: `${process.cwd()}> ${command} ${args.join(' ')}`, showStatusBar: true, interactive }) : null;
 
       const results = [];
       function processLayers(layers, callback) {
