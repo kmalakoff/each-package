@@ -14,6 +14,7 @@ export interface EachError extends Error {
 }
 
 export interface EachOptions extends SpawnOptions {
+  batch?: boolean;
   concurrency?: number;
   depth?: number;
   expanded?: boolean;
