@@ -9,8 +9,8 @@ import type { EachError, EachOptions, EachResult } from './types.ts';
 
 export default (argv: string[], name: string): undefined => {
   const options = getopts(argv, {
-    alias: { depth: 'd', concurrency: 'c', topological: 't', expanded: 'e', streaming: 's', silent: 'si', private: 'p', ignore: 'i', root: 'r' },
-    boolean: ['topological', 'expanded', 'streaming', 'silent', 'private', 'root'],
+    alias: { depth: 'd', concurrency: 'c', topological: 't', expanded: 'e', streaming: 's', silent: 'si', private: 'p', ignore: 'i', root: 'r', interactive: 'I' },
+    boolean: ['topological', 'expanded', 'streaming', 'silent', 'private', 'root', 'interactive'],
     default: { depth: Infinity, concurrency: Infinity },
     stopEarly: true,
   });
@@ -32,8 +32,9 @@ export default (argv: string[], name: string): undefined => {
 
     if (!options.silent) {
       // Load spawn-term to get figures/formatArguments for output formatting
-      loadSpawnTerm((_loadErr, { spawnTerm, figures, formatArguments }) => {
-        if (!spawnTerm) {
+      loadSpawnTerm((_loadErr, mod) => {
+        const { createSession, figures, formatArguments } = mod || { createSession: undefined, figures: { tick: '✓', cross: '✗' }, formatArguments: (x: string[]) => x };
+        if (!createSession) {
           console.log('\n======================');
           results.forEach((res) => {
             console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`);
