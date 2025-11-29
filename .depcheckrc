@@ -1,1 +1,1 @@
-ignores: ["each-package"]
+ignores: ["each-package", "ts-dev-stack", "node-version-use"]
