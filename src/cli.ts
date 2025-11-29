@@ -1,7 +1,7 @@
 import exit from 'exit';
 import getopts from 'getopts-compat';
-import spawnTerm, { figures, formatArguments } from 'spawn-term';
 import run from './index.ts';
+import loadSpawnTerm from './lib/loadSpawnTerm.ts';
 
 const ERROR_CODE = 5;
 
@@ -31,17 +31,22 @@ export default (argv: string[], name: string): undefined => {
     const errors = results.filter((result) => !!result.error);
 
     if (!options.silent) {
-      if (!spawnTerm) {
-        console.log('\n======================');
-        results.forEach((res) => {
-          console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`);
-        });
-      }
-      console.log('\n----------------------');
-      console.log(`${name} ${formatArguments(args)}`);
-      console.log(`${figures.tick} ${results.length - errors.length} succeeded`);
-      if (errors.length) console.log(`${figures.cross} ${errors.length} failed`);
+      // Load spawn-term to get figures/formatArguments for output formatting
+      loadSpawnTerm((_loadErr, { spawnTerm, figures, formatArguments }) => {
+        if (!spawnTerm) {
+          console.log('\n======================');
+          results.forEach((res) => {
+            console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`);
+          });
+          console.log('\n----------------------');
+          console.log(`${name} ${formatArguments(args)}`);
+          console.log(`${figures.tick} ${results.length - errors.length} succeeded`);
+          if (errors.length) console.log(`${figures.cross} ${errors.length} failed`);
+        }
+        exit(err || errors.length ? ERROR_CODE : 0);
+      });
+    } else {
+      exit(err || errors.length ? ERROR_CODE : 0);
     }
-    exit(err || errors.length ? ERROR_CODE : 0);
   });
 };

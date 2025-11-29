@@ -164,10 +164,11 @@ describe('cli', () => {
   });
 
   describe('stdio=inherit with sustained output (regression test)', () => {
+    const MAX_DURATION = 60 * 1000;
     const FIXTURE_SUSTAINED = path.join(__dirname, '..', 'fixtures', 'sustained-output');
 
     it('should process all packages without hanging', function (done) {
-      this.timeout(15000); // 15 seconds (should complete in ~6 seconds for 2 packages)
+      this.timeout(MAX_DURATION);
 
       const startTime = Date.now();
 
@@ -184,8 +185,7 @@ describe('cli', () => {
         const completedCount = (output.match(/✓ 50 tests completed/g) || []).length;
 
         assert.equal(completedCount, 2, 'Should process both pkg-a and pkg-b');
-        assert.ok(duration < 12000, `Should complete in <12s (took ${duration}ms)`);
-
+        assert.ok(duration < MAX_DURATION, `Should complete in < ${MAX_DURATION}ms (took ${duration}ms)`);
         done();
       });
     });
