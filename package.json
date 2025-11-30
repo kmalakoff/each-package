@@ -35,7 +35,7 @@
     "format": "biome check --write --unsafe",
     "prepublishOnly": "tsds validate",
     "test": "mocha --no-timeouts test/**/*.test.*",
-    "test:engines": "nvu -s -e engines tsds test:node --no-timeouts",
+    "test:engines": "nvu engines tsds test:node --no-timeouts",
     "version": "tsds version"
   },
   "dependencies": {
