@@ -1,5 +1,7 @@
 import assert from 'assert';
 import spawn from 'cross-spawn-cb';
+import fs from 'fs';
+import isVersion from 'is-version';
 import path from 'path';
 import url from 'url';
 import getLines from '../lib/getLines.ts';
@@ -8,6 +10,7 @@ const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : 
 const CLI = path.join(__dirname, '..', '..', 'bin', 'cli.js');
 const _NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
 const _ROOT = path.join(__dirname, '..', '..');
+const packageJson = JSON.parse(fs.readFileSync(path.join(_ROOT, 'package.json'), 'utf8'));
 const FIXTURE_ROOT = path.join(__dirname, '..', 'fixtures', 'root');
 const FIXTURE_SINGLE = path.join(__dirname, '..', 'fixtures', 'single-package');
 const FIXTURE_MULTIPLE = path.join(__dirname, '..', 'fixtures', 'multiple-packages');
@@ -158,6 +161,52 @@ describe('cli', () => {
     it('missing command', (done) => {
       spawn(CLI, ['--silent'], { encoding: 'utf8' }, (err) => {
         assert.ok(!!err);
+        done();
+      });
+    });
+  });
+
+  describe('version', () => {
+    it('--version', (done) => {
+      spawn(CLI, ['--version'], { encoding: 'utf8' }, (err, res) => {
+        if (err) return done(err.message);
+        const version = (res.stdout as string).trim();
+        assert.ok(isVersion(version), `Expected valid version, got: ${version}`);
+        assert.equal(version, packageJson.version);
+        done();
+      });
+    });
+
+    it('-v', (done) => {
+      spawn(CLI, ['-v'], { encoding: 'utf8' }, (err, res) => {
+        if (err) return done(err.message);
+        const version = (res.stdout as string).trim();
+        assert.ok(isVersion(version), `Expected valid version, got: ${version}`);
+        assert.equal(version, packageJson.version);
+        done();
+      });
+    });
+  });
+
+  describe('help', () => {
+    it('--help', (done) => {
+      spawn(CLI, ['--help'], { encoding: 'utf8' }, (err, res) => {
+        if (err) return done(err.message);
+        const output = res.stdout as string;
+        assert.ok(output.indexOf('Usage:') >= 0, 'Should contain Usage:');
+        assert.ok(output.indexOf('Options:') >= 0, 'Should contain Options:');
+        assert.ok(output.indexOf('--version') >= 0, 'Should mention --version');
+        assert.ok(output.indexOf('--help') >= 0, 'Should mention --help');
+        done();
+      });
+    });
+
+    it('-h', (done) => {
+      spawn(CLI, ['-h'], { encoding: 'utf8' }, (err, res) => {
+        if (err) return done(err.message);
+        const output = res.stdout as string;
+        assert.ok(output.indexOf('Usage:') >= 0, 'Should contain Usage:');
+        assert.ok(output.indexOf('Options:') >= 0, 'Should contain Options:');
         done();
       });
     });
