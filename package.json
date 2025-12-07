@@ -40,27 +40,27 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "*",
-    "exit": "*",
-    "fs-iterator": "*",
-    "getopts-compat": "*",
-    "install-module-linked": "*",
-    "lodash.find": "*",
-    "queue-cb": "*",
-    "remove-bom-buffer": "*",
-    "spawn-streaming": "*",
-    "test-match": "*",
-    "topological-sort-group": "*"
+    "cross-spawn-cb": "^2.4.10",
+    "exit": "^0.1.2",
+    "fs-iterator": "^6.1.10",
+    "getopts-compat": "^2.2.6",
+    "install-module-linked": "^1.3.10",
+    "lodash.find": "^4.6.0",
+    "queue-cb": "^1.6.1",
+    "remove-bom-buffer": "^3.0.0",
+    "spawn-streaming": "^1.1.13",
+    "test-match": "^1.1.1",
+    "topological-sort-group": "^3.0.3"
   },
   "devDependencies": {
-    "@types/mocha": "*",
-    "@types/node": "*",
-    "cr": "*",
-    "is-version": "*",
-    "node-version-use": "*",
-    "pinkie-promise": "*",
-    "ts-dev-stack": "*",
-    "tsds-config": "*"
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.10.1",
+    "cr": "^0.1.0",
+    "is-version": "^1.0.7",
+    "node-version-use": "^1.9.7",
+    "pinkie-promise": "^2.0.1",
+    "ts-dev-stack": "^1.21.2",
+    "tsds-config": "^0.2.0"
   },
   "engines": {
     "node": ">=0.8"

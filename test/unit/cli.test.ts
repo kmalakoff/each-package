@@ -20,7 +20,7 @@ describe('cli', () => {
     it('root', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_SINGLE }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
 
@@ -33,7 +33,7 @@ describe('cli', () => {
     it('node_modules/@types', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--private', 'echo', '"hello"'], { encoding: 'utf8', cwd: path.join(FIXTURE_MULTIPLE, '@scoped') }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -47,7 +47,7 @@ describe('cli', () => {
     it('root concurrency=10', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--concurrency=10', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_SINGLE }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -59,7 +59,7 @@ describe('cli', () => {
     it('node_modules/@types concurrency=10', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--concurrency=10', '--private', 'echo', '"hello"'], { encoding: 'utf8', cwd: path.join(FIXTURE_MULTIPLE, '@scoped') }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -73,7 +73,7 @@ describe('cli', () => {
     it('root ignore=node_modules', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--ignore=node_modules', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_SINGLE }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -85,7 +85,7 @@ describe('cli', () => {
     it('root ignore=each-package,each-package.*', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--ignore=*mocha*', '--private', 'echo', '"hello"'], { encoding: 'utf8', cwd: path.join(FIXTURE_MULTIPLE, 'packages') }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -97,7 +97,7 @@ describe('cli', () => {
     it('node_modules/@types ignore=mocha', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--ignore=pkg-x', '--private', 'echo', '"hello"'], { encoding: 'utf8', cwd: path.join(FIXTURE_MULTIPLE, '@scoped') }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -109,7 +109,7 @@ describe('cli', () => {
     it('node_modules ignore=each-package,each-package.*', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--ignore=*mocha*', '--private', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_MULTIPLE }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -123,7 +123,7 @@ describe('cli', () => {
     it('without --root flag (should exclude root package)', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--private', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_ROOT }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -135,7 +135,7 @@ describe('cli', () => {
     it('with --root flag (should include root package)', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--private', '--root', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_ROOT }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -147,7 +147,7 @@ describe('cli', () => {
     it('with -r flag (should include root package)', (done) => {
       spawn(CLI, ['--silent', '--expanded', '--streaming', '--private', '-r', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_ROOT }, (err, res) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         const results = getLines(res.stdout).filter((x) => x.indexOf('hello') >= 0);
@@ -169,7 +169,7 @@ describe('cli', () => {
   describe('version', () => {
     it('--version', (done) => {
       spawn(CLI, ['--version'], { encoding: 'utf8' }, (err, res) => {
-        if (err) return done(err.message);
+        if (err) return done(err);
         const version = (res.stdout as string).trim();
         assert.ok(isVersion(version), `Expected valid version, got: ${version}`);
         assert.equal(version, packageJson.version);
@@ -179,7 +179,7 @@ describe('cli', () => {
 
     it('-v', (done) => {
       spawn(CLI, ['-v'], { encoding: 'utf8' }, (err, res) => {
-        if (err) return done(err.message);
+        if (err) return done(err);
         const version = (res.stdout as string).trim();
         assert.ok(isVersion(version), `Expected valid version, got: ${version}`);
         assert.equal(version, packageJson.version);
@@ -191,7 +191,7 @@ describe('cli', () => {
   describe('help', () => {
     it('--help', (done) => {
       spawn(CLI, ['--help'], { encoding: 'utf8' }, (err, res) => {
-        if (err) return done(err.message);
+        if (err) return done(err);
         const output = res.stdout as string;
         assert.ok(output.indexOf('Usage:') >= 0, 'Should contain Usage:');
         assert.ok(output.indexOf('Options:') >= 0, 'Should contain Options:');
@@ -203,7 +203,7 @@ describe('cli', () => {
 
     it('-h', (done) => {
       spawn(CLI, ['-h'], { encoding: 'utf8' }, (err, res) => {
-        if (err) return done(err.message);
+        if (err) return done(err);
         const output = res.stdout as string;
         assert.ok(output.indexOf('Usage:') >= 0, 'Should contain Usage:');
         assert.ok(output.indexOf('Options:') >= 0, 'Should contain Options:');

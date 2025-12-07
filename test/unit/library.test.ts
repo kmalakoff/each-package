@@ -33,7 +33,7 @@ describe('library', () => {
     it('root', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', cwd: FIXTURE_SINGLE }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 0); // root excluded by default
@@ -44,7 +44,7 @@ describe('library', () => {
     it('node_modules/@types', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, cwd: path.join(FIXTURE_MULTIPLE, '@scoped') }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 2);
@@ -64,7 +64,7 @@ describe('library', () => {
     it('root concurrency=10', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', concurrency: 10, cwd: FIXTURE_SINGLE }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 0); // root excluded by default
@@ -75,7 +75,7 @@ describe('library', () => {
     it('node_modules/@types concurrency=10', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', concurrency: 10, private: true, cwd: path.join(FIXTURE_MULTIPLE, '@scoped') }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 2);
@@ -89,7 +89,7 @@ describe('library', () => {
     it('root ignore=node_modules', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: 'node_modules', cwd: FIXTURE_SINGLE }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 0); // root excluded by default
@@ -100,7 +100,7 @@ describe('library', () => {
     it('root ignore=each-package,each-package.*', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: '*mocha*', concurrency: 100, private: true, cwd: path.join(FIXTURE_MULTIPLE, 'packages') }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 4);
@@ -112,7 +112,7 @@ describe('library', () => {
     it('node_modules/@types ignore=mocha', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: 'pkg-x', private: true, cwd: path.join(FIXTURE_MULTIPLE, '@scoped') }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 1);
@@ -124,7 +124,7 @@ describe('library', () => {
     it('node_modules ignore=each-package,each-package.*', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', ignore: '*mocha*', concurrency: 100, private: true, cwd: FIXTURE_MULTIPLE }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 6);
@@ -138,7 +138,7 @@ describe('library', () => {
     it('with root: false (should exclude root package)', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', root: false, private: true, cwd: FIXTURE_ROOT }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 2); // pkg-a and pkg-b only
@@ -150,7 +150,7 @@ describe('library', () => {
     it('with root: true (should include root package)', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', root: true, private: true, cwd: FIXTURE_ROOT }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 3); // root, pkg-a, and pkg-b
@@ -162,7 +162,7 @@ describe('library', () => {
     it('with root: true and topological (should include root in dependency graph)', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', root: true, private: true, topological: true, cwd: FIXTURE_ROOT }, (err, results) => {
         if (err) {
-          done(err.message);
+          done(err);
           return;
         }
         assert.equal(results.length, 3); // root, pkg-a, and pkg-b
