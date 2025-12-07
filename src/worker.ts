@@ -25,6 +25,11 @@ export default function worker(command: string, args: string[], options: EachOpt
       const quotedArgs = args.map((arg) => (/\s/.test(arg) ? `"${arg}"` : arg));
       const session = createSession && !options.streaming && interactive ? createSession({ header: `${process.cwd()}> ${command} ${quotedArgs.join(' ')}`, showStatusBar: true, interactive }) : null;
 
+      // Show command header when not using terminal session (unless silent)
+      if (!session && !options.silent) {
+        console.log(`$ ${command} ${quotedArgs.join(' ')}`);
+      }
+
       const results = [];
       function processLayers(layers, callback) {
         if (layers.length === 0) return callback();
