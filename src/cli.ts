@@ -29,6 +29,7 @@ Options:
   -d, --depth <n>        Maximum depth to search for packages (default: Infinity)
   -c, --concurrency <n>  Number of packages to process in parallel (default: Infinity)
   -t, --topological      Process packages in topological order based on dependencies
+  -fd, --fail-dependents Skip packages whose dependencies failed (use with -t)
   -e, --expanded         Use expanded terminal UI for output
   -s, --streaming        Stream output as it happens
   -si, --silent          Suppress output
@@ -47,8 +48,8 @@ Examples:
 
 export default (argv: string[], name: string): undefined => {
   const options = getopts(argv, {
-    alias: { depth: 'd', concurrency: 'c', topological: 't', expanded: 'e', streaming: 's', silent: 'si', private: 'p', ignore: 'i', root: 'r', interactive: 'I', version: 'v', help: 'h' },
-    boolean: ['topological', 'expanded', 'streaming', 'silent', 'private', 'root', 'interactive', 'version', 'help'],
+    alias: { depth: 'd', concurrency: 'c', topological: 't', failDependents: 'fd', expanded: 'e', streaming: 's', silent: 'si', private: 'p', ignore: 'i', root: 'r', interactive: 'I', version: 'v', help: 'h' },
+    boolean: ['topological', 'failDependents', 'expanded', 'streaming', 'silent', 'private', 'root', 'interactive', 'version', 'help'],
     default: { depth: Infinity, concurrency: Infinity, interactive: true },
     stopEarly: true,
   });

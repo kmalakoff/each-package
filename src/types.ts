@@ -4,7 +4,7 @@ export interface EachResult {
   command: string;
   args: string[];
   path: string;
-  version: string;
+  version?: string;
   result?: SpawnResult;
   error?: Error;
 }
@@ -17,6 +17,7 @@ export interface EachOptions extends SpawnOptions {
   concurrency?: number;
   depth?: number;
   expanded?: boolean;
+  failDependents?: boolean;
   ignore?: string;
   interactive?: boolean;
   private?: boolean;
