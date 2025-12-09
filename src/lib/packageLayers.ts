@@ -1,10 +1,9 @@
 import fs from 'fs';
 import Iterator, { type Entry } from 'fs-iterator';
-import find from 'lodash.find';
 import path from 'path';
 import removeBOM from 'remove-bom-buffer';
 import match from 'test-match';
-import Graph from 'topological-sort-group';
+import Graph, { type DependencyGraph } from 'topological-sort-group';
 
 export interface PackageEntry extends Entry {
   package: { name: string; dependencies: object; optionalDependencies: object };
@@ -12,14 +11,7 @@ export interface PackageEntry extends Entry {
 
 import type { EachOptions } from '../types.ts';
 
-export interface PackageGraph {
-  entries: Record<string, PackageEntry>;
-  dependencies: Record<string, string[]>;
-  dependents: Record<string, string[]>;
-  roots: string[];
-}
-
-export type Callback = (err?: Error, result?: PackageEntry[][] | PackageGraph) => undefined;
+export type Callback = (err?: Error, result?: PackageEntry[][] | DependencyGraph<PackageEntry>) => undefined;
 
 const defaultIgnores = 'node_modules,.git';
 
@@ -47,7 +39,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
     depth,
     lstat: true,
   });
-  const entries = [];
+  const entries: PackageEntry[] = [];
   iterator.forEach(
     (entry: PackageEntry, cb): undefined => {
       if (!entry.stats.isFile()) {
@@ -79,91 +71,65 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         return callback(null, [sorted]);
       }
 
-      const graph = new Graph<PackageEntry>({ path: 'package.name' });
-      entries.forEach((entry) => {
-        graph.add(entry);
-      });
+      // Build nodes map
+      const nodes: Record<string, PackageEntry> = {};
+      const dependencies: Record<string, string[]> = {};
+      for (var i = 0; i < entries.length; i++) {
+        var entry = entries[i];
+        nodes[entry.package.name] = entry;
+        dependencies[entry.package.name] = [];
+      }
 
-      // Build maps for streaming execution
-      const entriesMap: Record<string, PackageEntry> = {};
-      const dependenciesMap: Record<string, string[]> = {};
-      const dependentsMap: Record<string, string[]> = {};
-
-      entries.forEach((entry: PackageEntry) => {
-        entriesMap[entry.package.name] = entry;
-        dependenciesMap[entry.package.name] = [];
-        dependentsMap[entry.package.name] = [];
-      });
-
-      // build graph edges from dependencies and optionalDependencies
-      entries.forEach((entry: PackageEntry) => {
-        const deps = { ...(entry.package.dependencies || {}), ...(entry.package.optionalDependencies || {}) };
-        for (const name in deps) {
-          const found = find(entries, (x) => x.package.name === name); // dependency in graph
-          if (found) {
-            graph.add(name, entry.package.name);
-            // Track dependencies: entry depends on name
-            dependenciesMap[entry.package.name].push(name);
-            // Track dependents: name has entry as a dependent
-            dependentsMap[name].push(entry.package.name);
+      // Build dependencies from package.json dependencies and optionalDependencies
+      for (var j = 0; j < entries.length; j++) {
+        var e = entries[j];
+        var deps = { ...(e.package.dependencies || {}), ...(e.package.optionalDependencies || {}) };
+        for (var name in deps) {
+          if (nodes[name]) {
+            // This package depends on another package in the graph
+            dependencies[e.package.name].push(name);
           }
         }
-      });
+      }
 
+      // Use Graph for cycle detection
+      const graph = Graph.from<PackageEntry>({ nodes, dependencies });
       const { cycles, duplicates } = graph.sort();
-      if (cycles && cycles.length)
+
+      if (cycles && cycles.length) {
         cycles.forEach((c) => {
           console.log(`Skipping cycle: ${c.join(' -> ')}`);
         });
-      if (duplicates && duplicates.length)
+      }
+      if (duplicates && duplicates.length) {
         duplicates.forEach((d) => {
           console.log(`Skipping duplicates: ${JSON.stringify(d.values.map((x) => x.path))}`);
         });
-
-      // Find roots (packages with no internal dependencies)
-      const roots: string[] = [];
-      for (const name in dependenciesMap) {
-        if (dependenciesMap[name].length === 0) {
-          roots.push(name);
-        }
       }
 
       // Remove cyclic packages from the graph
       if (cycles && cycles.length) {
         const cyclicPackages: Record<string, boolean> = {};
-        for (const c of cycles) {
-          for (const n of c) {
-            cyclicPackages[String(n)] = true;
+        for (var ci = 0; ci < cycles.length; ci++) {
+          var c = cycles[ci];
+          for (var cj = 0; cj < c.length; cj++) {
+            cyclicPackages[String(c[cj])] = true;
           }
         }
-        for (const name in cyclicPackages) {
-          delete entriesMap[name];
-          delete dependenciesMap[name];
-          delete dependentsMap[name];
-          const rootIdx = roots.indexOf(name);
-          if (rootIdx >= 0) roots.splice(rootIdx, 1);
+        for (var cyclicName in cyclicPackages) {
+          delete nodes[cyclicName];
+          delete dependencies[cyclicName];
         }
-        // Remove references to cyclic packages from dependencies/dependents
-        for (const key in dependenciesMap) {
-          const deps = dependenciesMap[key];
-          for (let i = deps.length - 1; i >= 0; i--) {
-            if (cyclicPackages[deps[i]]) deps.splice(i, 1);
-          }
-        }
-        for (const key in dependentsMap) {
-          const deps = dependentsMap[key];
-          for (let i = deps.length - 1; i >= 0; i--) {
-            if (cyclicPackages[deps[i]]) deps.splice(i, 1);
+        // Remove references to cyclic packages from dependencies
+        for (var key in dependencies) {
+          var depList = dependencies[key];
+          for (var di = depList.length - 1; di >= 0; di--) {
+            if (cyclicPackages[depList[di]]) depList.splice(di, 1);
           }
         }
       }
 
-      return callback(null, {
-        entries: entriesMap,
-        dependencies: dependenciesMap,
-        dependents: dependentsMap,
-        roots,
-      });
+      return callback(null, { nodes, dependencies });
     }
   );
 }

@@ -2,8 +2,9 @@ import type { SpawnResult } from 'cross-spawn-cb';
 import path from 'path';
 import Queue from 'queue-cb';
 import spawnStreaming from 'spawn-streaming';
+import schedule, { type DependencyGraph } from 'topological-scheduler';
 import loadSpawnTerm from './lib/loadSpawnTerm.ts';
-import packageLayers, { type PackageEntry, type PackageGraph } from './lib/packageLayers.ts';
+import packageLayers, { type PackageEntry } from './lib/packageLayers.ts';
 
 import type { EachCallback, EachError, EachOptions, EachResult } from './types.ts';
 
@@ -81,105 +82,33 @@ export default function worker(command: string, args: string[], options: EachOpt
         return;
       }
 
-      // Topological mode: streaming execution
-      const graph = result as PackageGraph;
-      const { entries, dependencies, dependents, roots } = graph;
+      // Topological mode: use topological-scheduler
+      const graph = result as DependencyGraph<PackageEntry>;
 
-      // Track in-degrees (number of incomplete dependencies)
-      const inDegree: Record<string, number> = {};
-      for (const name in dependencies) {
-        inDegree[name] = dependencies[name].length;
-      }
+      schedule(
+        graph,
+        (entry, _id, cb) => {
+          const spawnOptions = { ...options, cwd: path.dirname(entry.fullPath) };
+          const prefix = path.dirname(entry.path);
 
-      const completed: Record<string, boolean> = {};
-      const failed: Record<string, boolean> = {};
-      const skipped: Record<string, boolean> = {};
-      const running: Record<string, boolean> = {};
-      let runningCount = 0;
-      let completedCount = 0;
-      const ready: string[] = roots.slice();
+          const next = (err?: Error, res?: SpawnResult): undefined => {
+            if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
+              res = err as unknown as SpawnResult;
+              err = null;
+            }
 
-      // Count total entries
-      let totalEntries = 0;
-      for (const _name in entries) {
-        totalEntries++;
-      }
+            results.push({ path: prefix, command, args, error: err, result: res });
+            cb(err, res);
+          };
 
-      const hasFailedDependency = (name: string): boolean => {
-        if (!options.failDependents) return false;
-        const deps = dependencies[name] || [];
-        for (let i = 0; i < deps.length; i++) {
-          if (failed[deps[i]] || skipped[deps[i]]) return true;
+          if (session) session.spawn(command, args, spawnOptions, { group: prefix, expanded: options.expanded }, next);
+          else spawnStreaming(command, args, spawnOptions, { prefix }, next);
+        },
+        { concurrency, failDependents: options.failDependents },
+        (err) => {
+          finalize(err);
         }
-        return false;
-      };
-
-      const onComplete = (name: string, didFail: boolean, wasSkipped = false): void => {
-        delete running[name];
-        runningCount--;
-        completed[name] = true;
-        completedCount++;
-        if (didFail) failed[name] = true;
-        if (wasSkipped) skipped[name] = true;
-
-        // Unlock dependents
-        const deps = dependents[name] || [];
-        for (let i = 0; i < deps.length; i++) {
-          const dep = deps[i];
-          inDegree[dep]--;
-          if (inDegree[dep] === 0) {
-            ready.push(dep);
-          }
-        }
-
-        if (completedCount === totalEntries) {
-          finalize();
-        } else {
-          tryStartNext();
-        }
-      };
-
-      const runPackage = (name: string): void => {
-        const entry = entries[name];
-        const spawnOptions = { ...options, cwd: path.dirname(entry.fullPath) };
-        const prefix = path.dirname(entry.path);
-
-        const next = (err?: Error, res?: SpawnResult): undefined => {
-          if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
-            res = err as unknown as SpawnResult;
-            err = null;
-          }
-
-          results.push({ path: prefix, command, args, error: err, result: res });
-          onComplete(name, !!err);
-        };
-
-        if (session) session.spawn(command, args, spawnOptions, { group: prefix, expanded: options.expanded }, next);
-        else spawnStreaming(command, args, spawnOptions, { prefix }, next);
-      };
-
-      const tryStartNext = (): void => {
-        while (ready.length > 0 && runningCount < concurrency) {
-          const name = ready.shift();
-          if (hasFailedDependency(name)) {
-            // Skip this package and mark as skipped
-            skipped[name] = true;
-            onComplete(name, false, true);
-            continue;
-          }
-          running[name] = true;
-          runningCount++;
-          runPackage(name);
-        }
-      };
-
-      // Handle empty graph
-      if (totalEntries === 0) {
-        finalize();
-        return;
-      }
-
-      tryStartNext();
+      );
     });
   });
 }
