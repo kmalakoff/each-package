@@ -2,7 +2,7 @@
 // Simulates long-running process with sustained output (like npm test)
 // Produces ~2 seconds of continuous output to expose dual consumption bug
 
-var exit = require('exit');
+var exit = require('exit-compat');
 
 for (var i = 1; i <= 50; i++) {
   console.log('✓ test ' + i + 'passed (' + Math.floor(Math.random() * 100) + 'ms)');
