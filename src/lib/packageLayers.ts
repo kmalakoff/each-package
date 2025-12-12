@@ -74,17 +74,17 @@ export default function packageLayers(options: EachOptions, callback: Callback):
       // Build nodes map
       const nodes: Record<string, PackageEntry> = {};
       const dependencies: Record<string, string[]> = {};
-      for (var i = 0; i < entries.length; i++) {
-        var entry = entries[i];
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
         nodes[entry.package.name] = entry;
         dependencies[entry.package.name] = [];
       }
 
       // Build dependencies from package.json dependencies and optionalDependencies
-      for (var j = 0; j < entries.length; j++) {
-        var e = entries[j];
-        var deps = { ...(e.package.dependencies || {}), ...(e.package.optionalDependencies || {}) };
-        for (var name in deps) {
+      for (let j = 0; j < entries.length; j++) {
+        const e = entries[j];
+        const deps = { ...(e.package.dependencies || {}), ...(e.package.optionalDependencies || {}) };
+        for (const name in deps) {
           if (nodes[name]) {
             // This package depends on another package in the graph
             dependencies[e.package.name].push(name);
@@ -110,20 +110,20 @@ export default function packageLayers(options: EachOptions, callback: Callback):
       // Remove cyclic packages from the graph
       if (cycles && cycles.length) {
         const cyclicPackages: Record<string, boolean> = {};
-        for (var ci = 0; ci < cycles.length; ci++) {
-          var c = cycles[ci];
-          for (var cj = 0; cj < c.length; cj++) {
+        for (let ci = 0; ci < cycles.length; ci++) {
+          const c = cycles[ci];
+          for (let cj = 0; cj < c.length; cj++) {
             cyclicPackages[String(c[cj])] = true;
           }
         }
-        for (var cyclicName in cyclicPackages) {
+        for (const cyclicName in cyclicPackages) {
           delete nodes[cyclicName];
           delete dependencies[cyclicName];
         }
         // Remove references to cyclic packages from dependencies
-        for (var key in dependencies) {
-          var depList = dependencies[key];
-          for (var di = depList.length - 1; di >= 0; di--) {
+        for (const key in dependencies) {
+          const depList = dependencies[key];
+          for (let di = depList.length - 1; di >= 0; di--) {
             if (cyclicPackages[depList[di]]) depList.splice(di, 1);
           }
         }
