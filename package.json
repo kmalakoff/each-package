@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "cross-spawn-cb": "^2.4.14",
-    "exit-compat": "^1.0.3",
+    "exit-compat": "^1.0.4",
     "fs-iterator": "^6.1.12",
     "getopts-compat": "^2.2.6",
     "queue-cb": "^1.6.3",
