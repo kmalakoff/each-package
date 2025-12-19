@@ -27,4 +27,4 @@ export interface EachOptions extends SpawnOptions {
   topological?: boolean;
 }
 
-export type EachCallback = (err?: EachError, results?: EachResult[]) => undefined;
+export type EachCallback = (err?: EachError, results?: EachResult[]) => void;

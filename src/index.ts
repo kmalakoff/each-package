@@ -6,10 +6,10 @@ export * from './types.ts';
 export default function eachPackage(command: string, args: string[]): Promise<EachResult[]>;
 export default function eachPackage(command: string, args: string[], options: EachOptions): Promise<EachResult[]>;
 
-export default function eachPackage(command: string, args: string[], callback: EachCallback): undefined;
-export default function eachPackage(command: string, args: string[], options: EachOptions, callback: EachCallback): undefined;
+export default function eachPackage(command: string, args: string[], callback: EachCallback): void;
+export default function eachPackage(command: string, args: string[], options: EachOptions, callback: EachCallback): void;
 
-export default function eachPackage(command: string, args: string[], options?: EachOptions | EachCallback, callback?: EachCallback): undefined | Promise<EachResult[]> {
+export default function eachPackage(command: string, args: string[], options?: EachOptions | EachCallback, callback?: EachCallback): void | Promise<EachResult[]> {
   if (typeof options === 'function') {
     callback = options;
     options = {};
@@ -18,7 +18,7 @@ export default function eachPackage(command: string, args: string[], options?: E
 
   if (typeof callback === 'function') return worker(command, args, options, callback);
   return new Promise((resolve, reject) =>
-    worker(command, args, options, (err?: EachError, results?: EachResult[]): undefined => {
+    worker(command, args, options as EachOptions, (err?: EachError, results?: EachResult[]): void => {
       err ? reject(err) : resolve(results);
     })
   );

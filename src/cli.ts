@@ -46,7 +46,7 @@ Examples:
   ${name} -c 4 npm build   Run 'npm build' with concurrency of 4`);
 }
 
-export default (argv: string[], name: string): undefined => {
+export default (argv: string[], name: string): void => {
   const options = getopts(argv, {
     alias: { depth: 'd', concurrency: 'c', topological: 't', failDependents: 'fd', expanded: 'e', streaming: 's', silent: 'si', private: 'p', ignore: 'i', root: 'r', interactive: 'I', version: 'v', help: 'h' },
     boolean: ['topological', 'failDependents', 'expanded', 'streaming', 'silent', 'private', 'root', 'interactive', 'version', 'help'],
@@ -74,7 +74,7 @@ export default (argv: string[], name: string): undefined => {
   }
 
   options.stdio = 'inherit'; // pass through stdio
-  run(args[0], args.slice(1), options as EachOptions, (err?: EachError, results?: EachResult[]): undefined => {
+  run(args[0], args.slice(1), options as EachOptions, (err?: EachError, results?: EachResult[]): void => {
     if (err && !err.results) {
       console.log(err.message);
       exit(ERROR_CODE);
