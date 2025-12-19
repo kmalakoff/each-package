@@ -11,11 +11,11 @@ export interface PackageEntry extends Entry {
 
 import type { EachOptions } from '../types.ts';
 
-export type Callback = (err?: Error, result?: PackageEntry[][] | DependencyGraph<PackageEntry>) => undefined;
+export type Callback = (err?: Error, result?: PackageEntry[][] | DependencyGraph<PackageEntry>) => void;
 
 const defaultIgnores = 'node_modules,.git';
 
-export default function packageLayers(options: EachOptions, callback: Callback): undefined {
+export default function packageLayers(options: EachOptions, callback: Callback): void {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
 
@@ -41,7 +41,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
   });
   const entries: PackageEntry[] = [];
   iterator.forEach(
-    (entry: PackageEntry, cb): undefined => {
+    (entry: PackageEntry, cb): void => {
       if (!entry.stats.isFile()) {
         cb();
         return;
