@@ -8,7 +8,7 @@ import packageLayers, { type PackageEntry } from './lib/packageLayers.ts';
 
 import type { EachCallback, EachError, EachOptions, EachResult } from './types.ts';
 
-export default function worker(command: string, args: string[], options: EachOptions, callback: EachCallback): undefined {
+export default function worker(command: string, args: string[], options: EachOptions, callback: EachCallback): void {
   let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
   if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const concurrency = typeof options.concurrency === 'undefined' ? 1 : options.concurrency;
@@ -55,7 +55,7 @@ export default function worker(command: string, args: string[], options: EachOpt
             const spawnOptions = { ...options, cwd: path.dirname(entry.fullPath) };
             const prefix = path.dirname(entry.path);
 
-            const next = (err?: Error, res?: SpawnResult): undefined => {
+            const next = (err?: Error, res?: SpawnResult): void => {
               if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
                 res = err as unknown as SpawnResult;
                 err = null;
@@ -86,7 +86,7 @@ export default function worker(command: string, args: string[], options: EachOpt
         const spawnOptions = { ...options, cwd: path.dirname(entry.fullPath) };
         const prefix = path.dirname(entry.path);
 
-        const next = (err?: Error, res?: SpawnResult): undefined => {
+        const next = (err?: Error, res?: SpawnResult): void => {
           if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
             res = err as unknown as SpawnResult;
             err = null;
