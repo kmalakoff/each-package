@@ -10,15 +10,12 @@ export default function eachPackage(command: string, args: string[], callback: E
 export default function eachPackage(command: string, args: string[], options: EachOptions, callback: EachCallback): void;
 
 export default function eachPackage(command: string, args: string[], options?: EachOptions | EachCallback, callback?: EachCallback): void | Promise<EachResult[]> {
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
-  options = options || {};
+  callback = typeof options === 'function' ? options : callback;
+  options = typeof options === 'function' ? {} : ((options || {}) as EachOptions);
 
   if (typeof callback === 'function') return worker(command, args, options, callback);
   return new Promise((resolve, reject) =>
-    worker(command, args, options as EachOptions, (err?: EachError, results?: EachResult[]): void => {
+    worker(command, args, options, (err?: EachError, results?: EachResult[]): void => {
       err ? reject(err) : resolve(results);
     })
   );
