@@ -21,7 +21,7 @@ export default function worker(command: string, args: string[], options: EachOpt
     const interactive = !!options.interactive;
     const quotedArgs = args.map((arg) => (/\s/.test(arg) ? `"${arg}"` : arg));
 
-    const header = `${process.cwd()}> ${command} ${quotedArgs.join(' ')}`;
+    const header = `${process.cwd()}$ ${command} ${quotedArgs.join(' ')}`;
     const session = entries.length >= 2 && process.stdout.isTTY && createSession && !options.streaming && interactive ? createSession({ header, showStatusBar: true, interactive }) : null;
     if (!session && !options.silent) console.log(header);
 
@@ -52,7 +52,10 @@ export default function worker(command: string, args: string[], options: EachOpt
     };
 
     // Topological mode: use topological-scheduler
-    if (options.topological) schedule(graph, (entry, _id, cb) => spawnEntry(entry, cb), { concurrency, failDependents: options.failDependents }, finalize);
+    if (options.topological) {
+      schedule(graph, (entry, _id, cb) => spawnEntry(entry, cb), { concurrency, failDependents: options.failDependents }, finalize);
+    }
+
     // Non-topological mode: layers is PackageEntry[]
     else {
       const sorted = entries.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path))) as PackageEntry[];
