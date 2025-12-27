@@ -14,9 +14,5 @@ export default function eachPackage(command: string, args: string[], options?: E
   options = typeof options === 'function' ? {} : ((options || {}) as EachOptions);
 
   if (typeof callback === 'function') return worker(command, args, options, callback);
-  return new Promise((resolve, reject) =>
-    worker(command, args, options, (err?: EachError, results?: EachResult[]): void => {
-      err ? reject(err) : resolve(results);
-    })
-  );
+  return new Promise((resolve, reject) => worker(command, args, options, (err?: EachError, results?: EachResult[]): void => (err ? reject(err) : resolve(results))));
 }
