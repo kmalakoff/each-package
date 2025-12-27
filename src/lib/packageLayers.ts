@@ -1,6 +1,5 @@
 import fs from 'fs';
 import Iterator, { type Entry } from 'fs-iterator';
-import path from 'path';
 import removeBOM from 'remove-bom-buffer';
 import match from 'test-match';
 import Graph, { type DependencyGraph } from 'topological-sort-group';
@@ -11,7 +10,7 @@ export interface PackageEntry extends Entry {
 
 import type { EachOptions } from '../types.ts';
 
-export type Callback = (err?: Error, result?: PackageEntry[][] | DependencyGraph<PackageEntry>) => void;
+export type Callback = (err: Error | null, entries?: PackageEntry[], graph?: DependencyGraph<PackageEntry>) => void;
 
 const defaultIgnores = 'node_modules,.git';
 
@@ -66,10 +65,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
       if (err) return callback(err);
 
       // full graph at one layer, sorted by relative path
-      if (!options.topological) {
-        const sorted = entries.sort((a, b) => path.dirname(a.path).localeCompare(path.dirname(b.path))) as PackageEntry[];
-        return callback(null, [sorted]);
-      }
+      if (!options.topological) return callback(null, entries);
 
       // Build nodes map
       const nodes: Record<string, PackageEntry> = {};
@@ -96,16 +92,8 @@ export default function packageLayers(options: EachOptions, callback: Callback):
       const graph = Graph.from<PackageEntry>({ nodes, dependencies });
       const { cycles, duplicates } = graph.sort();
 
-      if (cycles && cycles.length) {
-        cycles.forEach((c) => {
-          console.log(`Skipping cycle: ${c.join(' -> ')}`);
-        });
-      }
-      if (duplicates && duplicates.length) {
-        duplicates.forEach((d) => {
-          console.log(`Skipping duplicates: ${JSON.stringify(d.values.map((x) => x.path))}`);
-        });
-      }
+      if (cycles && cycles.length) cycles.forEach((c) => console.log(`Skipping cycle: ${c.join(' -> ')}`));
+      if (duplicates && duplicates.length) duplicates.forEach((d) => console.log(`Skipping duplicates: ${JSON.stringify(d.values.map((x) => x.path))}`));
 
       // Remove cyclic packages from the graph
       if (cycles && cycles.length) {
@@ -129,7 +117,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         }
       }
 
-      return callback(null, { nodes, dependencies });
+      return callback(null, entries, { nodes, dependencies });
     }
   );
 }
