@@ -1,8 +1,11 @@
 import fs from 'fs';
 import Iterator, { type Entry } from 'fs-iterator';
+import os from 'os';
 import removeBOM from 'remove-bom-buffer';
 import match from 'test-match';
 import Graph, { type DependencyGraph } from 'topological-sort-group';
+
+const concurrency = Math.min(64, Math.max(8, (os.cpus()?.length ?? 4) * 8));
 
 export interface PackageEntry extends Entry {
   package: { name: string; dependencies: object; optionalDependencies: object };
@@ -60,7 +63,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         }
       });
     },
-    { concurrency: Infinity, callbacks: true },
+    { concurrency: options.concurrency || concurrency, callbacks: true },
     (err) => {
       if (err) return callback(err);
 
