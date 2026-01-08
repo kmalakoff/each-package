@@ -1,6 +1,7 @@
 import exit from 'exit-compat';
 import fs from 'fs';
 import getopts from 'getopts-compat';
+import os from 'os';
 import path from 'path';
 import { createSession, figures, formatArguments } from 'spawn-term';
 import url from 'url';
@@ -27,7 +28,7 @@ Run commands in each package folder within a monorepo.
 
 Options:
   -d, --depth <n>        Maximum depth to search for packages (default: Infinity)
-  -c, --concurrency <n>  Number of packages to process in parallel (default: Infinity)
+  -c, --concurrency <n>  Number of packages to process in parallel (default: cpu)
   -t, --topological      Process packages in topological order based on dependencies
   -fd, --fail-dependents Skip packages whose dependencies failed (use with -t)
   -e, --expanded         Use expanded terminal UI for output
@@ -46,11 +47,13 @@ Examples:
   ${name} -c 4 npm build   Run 'npm build' with concurrency of 4`);
 }
 
+const concurrency = Math.min(64, Math.max(8, (os.cpus()?.length ?? 4) * 8));
+
 export default (argv: string[], name: string): void => {
   const options = getopts(argv, {
     alias: { depth: 'd', concurrency: 'c', topological: 't', failDependents: 'fd', expanded: 'e', streaming: 's', silent: 'si', private: 'p', ignore: 'i', root: 'r', interactive: 'I', version: 'v', help: 'h' },
     boolean: ['topological', 'failDependents', 'expanded', 'streaming', 'silent', 'private', 'root', 'interactive', 'version', 'help'],
-    default: { depth: Infinity, concurrency: Infinity, interactive: true },
+    default: { depth: Infinity, concurrency, interactive: true },
     stopEarly: true,
   });
 
