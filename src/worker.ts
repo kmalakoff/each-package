@@ -27,23 +27,23 @@ export default function worker(command: string, args: string[], options: EachOpt
 
     const results: EachResult[] = [];
 
-    const finalize = (err?: Error): void => {
+    const finalize = (err?: Error | null): void => {
       if (err) (err as EachError).results = results;
       if (session) session.waitAndClose(() => (err ? callback(err as EachError) : callback(undefined, results)));
       else err ? callback(err as EachError) : callback(undefined, results);
     };
 
-    const spawnEntry = (entry: PackageEntry, cb: (err?: Error) => void): void => {
+    const spawnEntry = (entry: PackageEntry, cb: (err?: Error | null) => void): void => {
       const spawnOptions = { ...options, cwd: path.dirname(entry.fullPath) };
       const prefix = path.dirname(entry.path);
 
-      const next = (err?: Error, res?: SpawnResult): void => {
+      const next = (err?: Error | null, res?: SpawnResult): void => {
         if (err && err.message.indexOf('ExperimentalWarning') >= 0) {
           res = err as unknown as SpawnResult;
           err = undefined;
         }
 
-        results.push({ path: prefix, command, args, error: err, result: res });
+        results.push({ path: prefix, command, args, error: err ?? undefined, result: res });
         cb();
       };
 
