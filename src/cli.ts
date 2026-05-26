@@ -83,18 +83,18 @@ export default (argv: string[], name: string): void => {
       exit(ERROR_CODE);
       return;
     }
-    if (err) results = err.results;
-    const errors = results.filter((result) => !!result.error);
+    const allResults = (err ? err.results : results) ?? [];
+    const errors = allResults.filter((result) => !!result.error);
 
     if (!options.silent) {
       if (!createSession) {
         console.log('\n======================');
-        results.forEach((res) => {
+        allResults.forEach((res) => {
           console.log(`${res.error ? figures.cross : figures.tick} ${res.path}${res.error ? ` Error: ${res.error.message}` : ''}`);
         });
         console.log('\n----------------------');
         console.log(`${name} ${formatArguments(args)}`);
-        console.log(`${figures.tick} ${results.length - errors.length} succeeded`);
+        console.log(`${figures.tick} ${allResults.length - errors.length} succeeded`);
         if (errors.length) console.log(`${figures.cross} ${errors.length} failed`);
       }
     }
