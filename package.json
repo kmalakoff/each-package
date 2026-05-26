@@ -57,6 +57,7 @@
     "@types/node": "*",
     "cr": "^0.1.0",
     "is-version": "^1.0.9",
+    "maximize-iterator": "*",
     "node-version-use": "*",
     "pinkie-promise": "*",
     "ts-dev-stack": "*",

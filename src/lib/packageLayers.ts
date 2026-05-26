@@ -11,6 +11,7 @@ export interface PackageEntry extends Entry {
   package: { name: string; dependencies: object; optionalDependencies: object };
 }
 
+import type { EachDoneCallback } from 'maximize-iterator';
 import type { EachOptions } from '../types.ts';
 
 export type Callback = (err: Error | null, entries?: PackageEntry[], graph?: DependencyGraph<PackageEntry>) => void;
@@ -27,9 +28,9 @@ export default function packageLayers(options: EachOptions, callback: Callback):
   const matcher = match({ exclude: ignores });
 
   const iterator = new Iterator(cwd as string, {
-    filter: function filter(entry) {
-      if (entry.stats.isDirectory() || entry.realStats?.isDirectory()) return entry.basename[0] !== '.' && matcher(entry.basename);
-      if (entry.stats.isFile()) {
+    filter: function filter(entry: Entry) {
+      if (entry.stats?.isDirectory() || entry.realStats?.isDirectory()) return entry.basename[0] !== '.' && matcher(entry.basename);
+      if (entry.stats?.isFile()) {
         // Only include package.json files
         if (entry.basename !== 'package.json') return false;
         // Exclude root package.json unless --root flag is set
@@ -43,22 +44,23 @@ export default function packageLayers(options: EachOptions, callback: Callback):
   });
   const entries: PackageEntry[] = [];
   iterator.forEach(
-    (entry: PackageEntry, cb): void => {
-      if (!entry.stats.isFile()) {
+    (entry: Entry, cb: EachDoneCallback): void => {
+      const pkgEntry = entry as PackageEntry;
+      if (!pkgEntry.stats?.isFile()) {
         cb();
         return;
       }
-      fs.readFile(entry.fullPath, 'utf8', (err, contents) => {
+      fs.readFile(pkgEntry.fullPath, 'utf8', (err, contents) => {
         if (err) return cb(err);
         try {
           const pkg = JSON.parse(removeBOM(contents));
           if (pkg.private && !options.private) return cb();
           if (pkg.name === undefined) return cb(); // skip packages without names
-          entry.package = pkg;
-          entries.push(entry);
+          pkgEntry.package = pkg;
+          entries.push(pkgEntry);
           cb();
         } catch (_err) {
-          console.log(`Failed to parse JSON for ${entry.path}`);
+          console.log(`Failed to parse JSON for ${pkgEntry.path}`);
           cb();
         }
       });
