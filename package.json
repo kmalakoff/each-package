@@ -47,7 +47,7 @@
     "queue-cb": "^1.0.0",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.1.15",
-    "spawn-term": "^3.3.5",
+    "spawn-term": "^3.5.9",
     "test-match": "^1.0.0",
     "topological-scheduler": "^1.0.0",
     "topological-sort-group": "^4.0.2"
