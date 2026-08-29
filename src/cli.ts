@@ -27,7 +27,7 @@ function showHelp(name: string): void {
 Run commands in each package folder within a monorepo.
 
 Options:
-  -d, --depth <n>        Maximum depth below cwd to search for packages (default: Infinity)
+  -d, --depth <n>        Maximum package.json depth to search for packages (default: Infinity)
   -c, --concurrency <n>  Number of packages to process in parallel (default: cpu)
   -t, --topological      Process packages in topological order based on dependencies
   -fd, --fail-dependents Skip packages whose dependencies failed (use with -t)
