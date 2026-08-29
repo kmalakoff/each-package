@@ -1,12 +1,12 @@
 import exit from 'exit-compat';
 import fs from 'fs';
 import getopts from 'getopts-compat';
+import Module from 'module';
 import os from 'os';
 import path from 'path';
-import { createSession, figures, formatArguments } from 'spawn-term';
 import url from 'url';
-import run from './index.ts';
 
+const _require = typeof require === 'undefined' ? Module.createRequire(import.meta.url) : require;
 const ERROR_CODE = 5;
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 
@@ -77,16 +77,19 @@ export default (argv: string[], name: string): void => {
   }
 
   options.stdio = 'inherit'; // pass through stdio
-  run(args[0], args.slice(1), options as EachOptions, (err?: EachError, results?: EachResult[]): void => {
-    if (err && !err.results) {
-      console.log(err.message);
+  const report = (err?: EachError | Error | null, results?: EachResult[]): void => {
+    const epErr = err as EachError | undefined;
+    if (epErr && !epErr.results) {
+      console.log(epErr.message);
       exit(ERROR_CODE);
       return;
     }
-    const allResults = (err ? err.results : results) ?? [];
+    const allResults = (epErr ? epErr.results : results) ?? [];
     const errors = allResults.filter((result) => !!result.error);
 
     if (!options.silent) {
+      // deferred: spawn-term's session/formatting helpers are only needed to report run results
+      const { createSession, figures, formatArguments } = _require('spawn-term');
       if (!createSession) {
         console.log('\n======================');
         allResults.forEach((res) => {
@@ -99,5 +102,25 @@ export default (argv: string[], name: string): void => {
       }
     }
     exit(err || errors.length ? ERROR_CODE : 0);
-  });
+  };
+  // deferred: index.ts pulls the whole scheduling/spawn pipeline. require() cannot load this ESM
+  // sibling below Node 20.19 (require(esm)), so the ESM half needs a real dynamic import; the CJS
+  // half's sibling is genuine CommonJS, so a plain synchronous require avoids depending on
+  // Promise, which isn't global before Node 0.12.
+  loadIndex((err, run) => (err || !run ? report(err) : run(args[0], args.slice(1), options as EachOptions, report)));
 };
+
+type RunFn = (command: string, args: string[], options: EachOptions, callback: (err?: EachError | Error | null, results?: EachResult[]) => void) => void;
+
+function loadIndex(callback: (err: Error | null, run?: RunFn) => void): void {
+  if (typeof require === 'undefined') {
+    import('./index.js').then((mod) => callback(null, mod.default || mod)).catch((err) => callback(err instanceof Error ? err : new Error(String(err))));
+  } else {
+    try {
+      const mod = require('./index.js');
+      callback(null, mod.default || mod);
+    } catch (err) {
+      callback(err instanceof Error ? err : new Error(String(err)));
+    }
+  }
+}
