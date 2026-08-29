@@ -9,8 +9,6 @@ import packageLayers, { type PackageEntry } from './lib/packageLayers.ts';
 import type { EachCallback, EachError, EachOptions, EachResult } from './types.ts';
 
 export default function worker(command: string, args: string[], options: EachOptions, callback: EachCallback): void {
-  let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
-  if (depth !== Infinity) depth++; // depth is relative to first level of packages
   const concurrency = typeof options.concurrency === 'undefined' ? 1 : options.concurrency;
 
   packageLayers(options, (err, entries, graph) => {

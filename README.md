@@ -7,7 +7,7 @@ Run commands in each package folder starting with cwd skipping node_modules fold
 $ ep npm test
 
 # top and second level only (default depth: Infinity)
-$ ep -d1 npm test
+$ ep -d2 npm test
 
 # one at a time (default depth: concurrency)
 $ ep -c1 npm test

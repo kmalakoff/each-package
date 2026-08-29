@@ -19,8 +19,7 @@ export type Callback = (err: Error | null, entries?: PackageEntry[], graph?: Dep
 const defaultIgnores = 'node_modules,.git';
 
 export default function packageLayers(options: EachOptions, callback: Callback): void {
-  let depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
-  if (depth !== Infinity) depth++; // depth is relative to first level of packages
+  const depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
 
   const cwd = options.cwd || process.cwd();
 

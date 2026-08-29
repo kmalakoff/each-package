@@ -12,6 +12,7 @@ const _ROOT = path.join(__dirname, '..', '..');
 const FIXTURE_ROOT = path.join(__dirname, '..', 'fixtures', 'root');
 const FIXTURE_SINGLE = path.join(__dirname, '..', 'fixtures', 'single-package');
 const FIXTURE_MULTIPLE = path.join(__dirname, '..', 'fixtures', 'multiple-packages');
+const FIXTURE_DEPTH = path.join(__dirname, '..', 'fixtures', 'depth');
 
 const isWindows = process.platform === 'win32' || /^(msys|cygwin)$/.test(process.env.OSTYPE ?? '');
 const NODE = isWindows ? 'node.exe' : 'node';
@@ -106,6 +107,40 @@ describe('library', () => {
         if (err || !results) return done(err ?? new Error('No results'));
         assert.equal(results.length, 6);
         assert.ok(isVersion(getLines(results[0]?.result?.stdout ?? '').slice(-1)[0], 'v'));
+        done();
+      });
+    });
+  });
+
+  describe('depth', () => {
+    it('depth: 1 (top level only)', (done) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, depth: 1, cwd: FIXTURE_DEPTH }, (err, results) => {
+        if (err || !results) return done(err ?? new Error('No results'));
+        assert.equal(results.length, 1); // pkg-top only
+        done();
+      });
+    });
+
+    it('depth: 2 (top and second level)', (done) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, depth: 2, cwd: FIXTURE_DEPTH }, (err, results) => {
+        if (err || !results) return done(err ?? new Error('No results'));
+        assert.equal(results.length, 2); // pkg-top and pkg-mid, not pkg-bottom
+        done();
+      });
+    });
+
+    it('depth: 3 (all levels)', (done) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, depth: 3, cwd: FIXTURE_DEPTH }, (err, results) => {
+        if (err || !results) return done(err ?? new Error('No results'));
+        assert.equal(results.length, 3);
+        done();
+      });
+    });
+
+    it('depth: undefined (all levels)', (done) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, cwd: FIXTURE_DEPTH }, (err, results) => {
+        if (err || !results) return done(err ?? new Error('No results'));
+        assert.equal(results.length, 3);
         done();
       });
     });
