@@ -5,6 +5,7 @@ import path from 'path';
 import removeBOM from 'remove-bom-buffer';
 import match from 'test-match';
 import Graph, { type DependencyGraph } from 'topological-sort-group';
+import { existsSync } from '../compat.ts';
 
 const concurrency = Math.min(64, Math.max(8, (os.cpus()?.length ?? 4) * 8));
 
@@ -27,7 +28,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
   const ignores = options.ignore ? options.ignore : defaultIgnores;
   const matcher = match({ exclude: ignores });
   // depth is the count of package.json files from cwd, so folders without a package.json don't count
-  const levels: Record<string, number> = {};
+  const levels: Record<string, number> = { '.': existsSync(path.join(cwd as string, 'package.json')) ? 1 : 0 };
 
   const iterator = new Iterator(cwd as string, {
     filter: function filter(entry: Entry, cb: (err: Error | null, keep: boolean) => void): void {
