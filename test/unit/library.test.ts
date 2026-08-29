@@ -113,34 +113,34 @@ describe('library', () => {
   });
 
   describe('depth', () => {
-    it('depth: 1 (top level only)', (done) => {
+    it('depth: 1 (skip nested test packages)', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, depth: 1, cwd: FIXTURE_DEPTH }, (err, results) => {
         if (err || !results) return done(err ?? new Error('No results'));
-        assert.equal(results.length, 1); // pkg-top only
+        assert.equal(results.length, 2); // pkg-a and pkg-b only
         done();
       });
     });
 
-    it('depth: 2 (top and second level)', (done) => {
+    it('depth: 2 (includes nested test packages)', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, depth: 2, cwd: FIXTURE_DEPTH }, (err, results) => {
         if (err || !results) return done(err ?? new Error('No results'));
-        assert.equal(results.length, 2); // pkg-top and pkg-mid, not pkg-bottom
+        assert.equal(results.length, 3);
         done();
       });
     });
 
-    it('depth: 3 (all levels)', (done) => {
+    it('depth: 3 (all)', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, depth: 3, cwd: FIXTURE_DEPTH }, (err, results) => {
         if (err || !results) return done(err ?? new Error('No results'));
-        assert.equal(results.length, 3);
+        assert.equal(results.length, 4);
         done();
       });
     });
 
-    it('depth: undefined (all levels)', (done) => {
+    it('depth: undefined (all)', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, cwd: FIXTURE_DEPTH }, (err, results) => {
         if (err || !results) return done(err ?? new Error('No results'));
-        assert.equal(results.length, 3);
+        assert.equal(results.length, 4);
         done();
       });
     });

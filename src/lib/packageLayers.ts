@@ -1,6 +1,7 @@
 import fs from 'fs';
 import Iterator, { type Entry } from 'fs-iterator';
 import os from 'os';
+import path from 'path';
 import removeBOM from 'remove-bom-buffer';
 import match from 'test-match';
 import Graph, { type DependencyGraph } from 'topological-sort-group';
@@ -25,20 +26,30 @@ export default function packageLayers(options: EachOptions, callback: Callback):
 
   const ignores = options.ignore ? options.ignore : defaultIgnores;
   const matcher = match({ exclude: ignores });
+  // depth is the count of package.json files from cwd, so folders without a package.json don't count
+  const levels: Record<string, number> = {};
 
   const iterator = new Iterator(cwd as string, {
-    filter: function filter(entry: Entry) {
-      if (entry.stats?.isDirectory() || entry.realStats?.isDirectory()) return entry.basename[0] !== '.' && matcher(entry.basename);
+    filter: function filter(entry: Entry, cb: (err: Error | null, keep: boolean) => void): void {
       if (entry.stats?.isFile()) {
         // Only include package.json files
-        if (entry.basename !== 'package.json') return false;
+        if (entry.basename !== 'package.json') return cb(null, false);
         // Exclude root package.json unless --root flag is set
-        if (!options.root && entry.path === 'package.json') return false;
-        return true;
+        if (!options.root && entry.path === 'package.json') return cb(null, false);
+        return cb(null, true);
       }
-      return false;
+      if (!(entry.stats?.isDirectory() || entry.realStats?.isDirectory())) return cb(null, false);
+      if (entry.basename[0] === '.' || !matcher(entry.basename)) return cb(null, false);
+      const parent = path.dirname(entry.path);
+      const parentLevel = levels[parent] || 0;
+      // every package below here is at least parentLevel + 1 deep
+      if (parentLevel + 1 > depth) return cb(null, false);
+      fs.stat(path.join(entry.fullPath, 'package.json'), (err) => {
+        levels[entry.path] = parentLevel + (err ? 0 : 1);
+        cb(null, true);
+      });
     },
-    depth,
+    callbacks: true,
     lstat: true,
   });
   const entries: PackageEntry[] = [];
@@ -86,7 +97,7 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         const deps = { ...(e.package.dependencies || {}), ...(e.package.optionalDependencies || {}) };
         for (const name in deps) {
           if (nodes[name]) {
-            // This package depends on another package in the graph
+            // this package depends on another package in the graph
             dependencies[e.package.name].push(name);
           }
         }
