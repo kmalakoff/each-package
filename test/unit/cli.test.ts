@@ -14,6 +14,7 @@ const packageJson = JSON.parse(fs.readFileSync(path.join(_ROOT, 'package.json'),
 const FIXTURE_ROOT = path.join(__dirname, '..', 'fixtures', 'root');
 const FIXTURE_SINGLE = path.join(__dirname, '..', 'fixtures', 'single-package');
 const FIXTURE_MULTIPLE = path.join(__dirname, '..', 'fixtures', 'multiple-packages');
+const FIXTURE_DEPTH = path.join(__dirname, '..', 'fixtures', 'depth');
 
 describe('cli', () => {
   describe('basic command', () => {
@@ -90,6 +91,17 @@ describe('cli', () => {
         if (err) return done(err);
         const results = getLines(res?.stdout ?? '').filter((x) => x.indexOf('hello') >= 0);
         assert.equal(results.length, 6);
+        done();
+      });
+    });
+  });
+
+  describe('depth', () => {
+    it('default depth: 1 (skip nested test packages)', (done) => {
+      spawn(CLI, ['--silent', '--expanded', '--streaming', '--private', 'echo', '"hello"'], { encoding: 'utf8', cwd: FIXTURE_DEPTH }, (err, res) => {
+        if (err) return done(err);
+        const results = getLines(res?.stdout ?? '').filter((x) => x.indexOf('hello') >= 0);
+        assert.equal(results.length, 2); // pkg-a and group/pkg-b only
         done();
       });
     });
