@@ -3,19 +3,19 @@
 Run commands in each package folder starting with cwd skipping node_modules folders
 
 ```
-# infinite depth
+# top-level packages only, skipping nested test packages (default depth: 1)
 $ ep npm test
 
-# packages only, skipping nested test packages (default depth: Infinity)
-$ ep -d1 npm test
+# search deeper, including nested test packages
+$ ep -d2 npm test
 
-# one at a time (default depth: concurrency)
+# one at a time (default concurrency: cpu)
 $ ep -c1 npm test
 
 # topological (default topological: false)
 $ ep -t npm deploy
 
-# one at a time (default private: false)
+# include private packages (default private: false)
 $ ep -p npm test
 
 # include the root package.json if it exists (default root: false)
