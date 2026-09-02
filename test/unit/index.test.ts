@@ -121,6 +121,14 @@ describe('library', () => {
       });
     });
 
+    it('depth: 1 with root package.json (root does not count as a level)', (done) => {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, depth: 1, cwd: FIXTURE_ROOT }, (err, results) => {
+        if (err || !results) return done(err ?? new Error('No results'));
+        assert.equal(results.length, 2); // pkg-a and pkg-b only; root package.json is not a level
+        done();
+      });
+    });
+
     it('depth: 2 (includes nested test packages)', (done) => {
       eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', private: true, depth: 2, cwd: FIXTURE_DEPTH }, (err, results) => {
         if (err || !results) return done(err ?? new Error('No results'));

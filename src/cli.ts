@@ -27,7 +27,7 @@ function showHelp(name: string): void {
 Run commands in each package folder within a monorepo.
 
 Options:
-  -d, --depth <n>        Maximum package.json depth to search for packages (default: Infinity)
+  -d, --depth <n>        Maximum package.json depth to search for packages (default: 1)
   -c, --concurrency <n>  Number of packages to process in parallel (default: cpu)
   -t, --topological      Process packages in topological order based on dependencies
   -fd, --fail-dependents Skip packages whose dependencies failed (use with -t)
@@ -53,7 +53,7 @@ export default (argv: string[], name: string): void => {
   const options = getopts(argv, {
     alias: { depth: 'd', concurrency: 'c', topological: 't', failDependents: 'fd', expanded: 'e', streaming: 's', silent: 'si', private: 'p', ignore: 'i', root: 'r', interactive: 'I', version: 'v', help: 'h' },
     boolean: ['topological', 'failDependents', 'expanded', 'streaming', 'silent', 'private', 'root', 'interactive', 'version', 'help'],
-    default: { depth: Infinity, concurrency, interactive: true },
+    default: { depth: 1, concurrency, interactive: true },
     stopEarly: true,
   });
 
