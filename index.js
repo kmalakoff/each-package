@@ -1,5 +1,6 @@
 var path = require('path');
 var Iterator = require('fs-iterator');
+var assign = require('object-assign');
 var spawn = require('cross-spawn-cb');
 
 module.exports = function eachPackage(command, args, options, callback) {
@@ -20,8 +21,7 @@ module.exports = function eachPackage(command, args, options, callback) {
     depth: depth,
   });
 
-  var counter = 0;
-  var errors = [];
+  var results = [];
   iterator.forEach(
     function (entry, callback) {
       if (!entry.stats.isFile()) return callback();
@@ -32,36 +32,18 @@ module.exports = function eachPackage(command, args, options, callback) {
         console.log('----------------------');
       }
 
-      counter++;
-      spawn(command, args, { stdio: 'inherit', cwd: path.dirname(entry.fullPath) }, function (err, res) {
+      var spawnOptions = assign({}, options, { cwd: path.dirname(entry.fullPath) });
+      if (!spawnOptions.stdout && !spawnOptions.stdio) spawnOptions.stdio = 'inherit';
+
+      spawn(command, args, spawnOptions, function (err, res) {
         if (err) return callback(err);
-        if (res.code !== 0) errors.push({ entry: entry, res: res });
+        results.push({ path: entry.path, result: res });
         callback();
       });
     },
     { callbacks: true, concurrency: 1 },
     function iteratorCallback(err) {
-      if (err) return callback(err);
-      if (!errors.length) {
-        if (!options.silent) {
-          console.log('\n**********************');
-          console.log('Success (' + counter + ')');
-          console.log('**********************');
-        }
-
-        return callback();
-      }
-
-      if (!options.silent) {
-        console.log('\n**********************');
-        console.log('Errors (' + errors.length + ' of ' + counter + ')');
-        for (var i = 0; i < errors.length; i++) {
-          var error = errors[i];
-          console.log(error.entry.path, error.res.code);
-        }
-        console.log('**********************');
-      }
-      callback(new Error('Errors ' + errors.length));
+      err ? callback(err) : callback(null, results);
     }
   );
 };
