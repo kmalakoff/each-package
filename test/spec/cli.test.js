@@ -7,7 +7,7 @@ describe('cli', function () {
     it('basic command', function (done) {
       spawn(path.join(__dirname, '..', '..', 'bin', 'each-package'), ['npm', 'whoami'], { stdio: 'inherit' }, function (err, res) {
         assert.ok(!err);
-        assert.equal(res.exitCode, 0);
+        assert.equal(res.code, 0);
         done();
       });
     });
@@ -15,7 +15,7 @@ describe('cli', function () {
     it('basic command with options', function (done) {
       spawn(path.join(__dirname, '..', '..', 'bin', 'each-package'), ['--', 'node', '--version'], { stdio: 'inherit' }, function (err, res) {
         assert.ok(!err);
-        assert.equal(res.exitCode, 0);
+        assert.equal(res.code, 0);
         done();
       });
     });
@@ -25,7 +25,7 @@ describe('cli', function () {
     it('missing command', function (done) {
       spawn(path.join(__dirname, '..', '..', 'bin', 'each-package'), [], { stdio: 'inherit' }, function (err, res) {
         assert.ok(!err);
-        assert.ok(res.exitCode !== 0);
+        assert.ok(res.code !== 0);
         done();
       });
     });

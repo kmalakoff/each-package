@@ -2,11 +2,7 @@
 
 var program = require('commander');
 
-function parseInteger(value) {
-  return ++value;
-}
-
-program.option('-d, --depth <depth>', 'depth', parseInteger, Infinity);
+program.option('-d, --depth <depth>', 'depth', parseInt, Infinity);
 program.parse(process.argv);
 
 var args = Array.prototype.slice.call(program.args, 0);
@@ -20,7 +16,7 @@ var eachPackage = require('..');
 eachPackage(args[0], args.slice(1), program, function (err) {
   if (err) {
     console.log(err.message);
-    return process.exit(err.exitCode || -1);
+    return process.exit(err.code || -1);
   }
   process.exit(0);
 });

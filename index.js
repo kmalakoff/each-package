@@ -26,7 +26,7 @@ module.exports = function eachPackage(command, args, options, callback) {
       counter++;
       exec(command, args, { relativePath: path.dirname(entry.path), cwd: path.dirname(entry.fullPath), silent: options.silent }, function (err, res) {
         if (err) return callback(err);
-        if (res.exitCode !== 0) errors.push({ entry: entry, res: res });
+        if (res.code !== 0) errors.push({ entry: entry, res: res });
         callback();
       });
     },
@@ -48,7 +48,7 @@ module.exports = function eachPackage(command, args, options, callback) {
         console.log('Errors (' + errors.length + ' of ' + counter + ')');
         for (var i = 0; i < errors.length; i++) {
           var error = errors[i];
-          console.log(error.entry.path, error.res.exitCode);
+          console.log(error.entry.path, error.res.code);
         }
         console.log('**********************');
       }
