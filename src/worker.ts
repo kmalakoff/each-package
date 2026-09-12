@@ -20,10 +20,10 @@ export default function worker(command: string, args: string[], options: EachOpt
     packageLayers(options, (err, layers) => {
       if (err) return callback(err);
 
-      // Create session once for all processes
-      const interactive = options.batch ? false : options.interactive !== false;
+      // Create session once for all processes (only when interactive is explicitly enabled, e.g. by CLI)
+      const interactive = !!options.interactive;
       const quotedArgs = args.map((arg) => (/\s/.test(arg) ? `"${arg}"` : arg));
-      const session = createSession && !options.streaming ? createSession({ header: `${process.cwd()}> ${command} ${quotedArgs.join(' ')}`, showStatusBar: true, interactive }) : null;
+      const session = createSession && !options.streaming && interactive ? createSession({ header: `${process.cwd()}> ${command} ${quotedArgs.join(' ')}`, showStatusBar: true, interactive }) : null;
 
       const results = [];
       function processLayers(layers, callback) {
