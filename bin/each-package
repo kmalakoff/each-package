@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-var program = require('commander');
+var options = require('yargs-parser')(process.argv.slice(2), {
+  configuration: { 'halt-at-non-option': true },
+});
 
-program.option('-d, --depth <depth>', 'depth', parseInt, Infinity);
-program.parse(process.argv);
-
-var args = Array.prototype.slice.call(program.args, 0);
+var args = options._;
 if (!args.length) {
   console.log('Missing command. Example usage: each-package [command]');
   return process.exit(-1);
@@ -13,7 +12,7 @@ if (!args.length) {
 
 var eachPackage = require('..');
 
-eachPackage(args[0], args.slice(1), program, function (err) {
+eachPackage(args[0], args.slice(1), options, function (err) {
   if (err) {
     console.log(err.message);
     return process.exit(err.code || -1);
