@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - lts/*
+os:
+  - linux
+  - osx
+  - windows
+script:
+  - npm uninstall node-version-use -g
+  - npm install node-version-use -g
+  - nvu engines npm test
