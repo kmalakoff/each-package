@@ -1,13 +1,19 @@
 #!/usr/bin/env node
 
-var eachPackage = require('..');
+var program = require('commander');
 
-if (process.argv.length < 3) {
-  console.log('Missing arguments. Example usage: each-package [command]');
+program.option('-d, --depth <depth>', 'depth', parseInt.bind(null, 10), Infinity);
+program.parse(process.argv);
+
+var args = Array.prototype.slice.call(program.args, 0);
+if (!args.length) {
+  console.log('Missing command. Example usage: each-package [command]');
   return process.exit(-1);
 }
 
-eachPackage(process.argv[2], process.argv.slice(3), function (err) {
+var eachPackage = require('..');
+
+eachPackage(args[0], args.slice(1), program, function (err) {
   if (err) {
     console.log(err.message);
     return process.exit(err.exitCode || -1);
