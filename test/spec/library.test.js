@@ -3,7 +3,7 @@ var isVersion = require('is-version');
 
 var eachPackage = require('../..');
 
-var EOL = /\r\n|\r|\n/;
+var EOL = process.platform === 'win32' ? '\r\n' : '\n';
 
 describe('library', function () {
   describe('happy path', function () {
@@ -13,6 +13,18 @@ describe('library', function () {
         assert.ok(isVersion(results[0].result.stdout.split(EOL).slice(-2, -1)[0], 'v'));
         done();
       });
+    });
+    it('basic command (promises)', function (done) {
+      if (typeof Promise === 'undefined') return;
+
+      eachPackage('node', ['--version'], { silent: true, stdout: 'string' })
+        .then(function (results) {
+          assert.ok(isVersion(results[0].result.stdout.split(EOL).slice(-2, -1)[0], 'v'));
+          done();
+        })
+        .catch(function (err) {
+          assert.ok(!err);
+        });
     });
   });
 });

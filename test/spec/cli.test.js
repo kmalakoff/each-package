@@ -4,7 +4,7 @@ var spawn = require('cross-spawn-cb');
 var isVersion = require('is-version');
 
 var CLI = path.join(__dirname, '..', '..', 'bin', 'each-package');
-var EOL = /\r\n|\r|\n/;
+var EOL = process.platform === 'win32' ? '\r\n' : '\n';
 
 describe('cli', function () {
   describe('happy path', function () {
