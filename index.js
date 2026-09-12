@@ -14,7 +14,7 @@ module.exports = function eachPackage(command, args, options, callback) {
       if (entry.stats.isDirectory()) return entry.basename !== '.git' && entry.basename !== 'node_modules';
       if (entry.stats.isFile()) return entry.basename === 'package.json';
     },
-    depth: options.depth || Infinity,
+    depth: typeof options.depth === 'undefined' ? Infinity : options.depth,
   });
 
   var counter = 0;
