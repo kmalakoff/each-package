@@ -5,12 +5,24 @@ import Module from 'module';
 import os from 'os';
 import path from 'path';
 import url from 'url';
+import { ERROR_CODE } from './constants.ts';
+import loadConfig, { type ConfigResult, type ConfigValues } from './lib/loadConfig.ts';
+import toList from './lib/toList.ts';
 
 const _require = typeof require === 'undefined' ? Module.createRequire(import.meta.url) : require;
-const ERROR_CODE = 5;
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 
 import type { EachError, EachOptions, EachResult } from './types.ts';
+
+const ALIAS = { depth: 'd', concurrency: 'c', topological: 't', failDependents: ['fail-dependents'], expanded: 'e', streaming: 's', private: 'p', exclude: 'x', ignore: 'i', root: 'r', interactive: 'I', version: 'v', help: 'h' };
+const BOOLEAN = ['topological', 'failDependents', 'expanded', 'streaming', 'silent', 'private', 'dot', 'config', 'root', 'interactive', 'version', 'help'];
+const concurrency = Math.min(64, Math.max(8, (os.cpus()?.length ?? 4) * 8));
+
+type Parsed = Record<string, unknown> & { _: string[] };
+
+function parse(argv: string[], defaults: Record<string, unknown>): Parsed {
+  return getopts(argv, { alias: ALIAS, boolean: BOOLEAN, default: defaults, stopEarly: true }) as Parsed;
+}
 
 function getVersion(): string {
   const packagePath = path.resolve(__dirname, '..', '..', 'package.json');
@@ -18,55 +30,112 @@ function getVersion(): string {
   return packageJson.version;
 }
 
-function showHelp(name: string): void {
-  const version = getVersion();
-  console.log(`${name} v${version}`);
+function describeValue(key: string, values: ConfigValues): string {
+  if (key === 'depth') return `depth ${values.depth}`;
+  if (key === 'exclude') return `exclude ${(values.exclude || []).join(',')}`;
+  return values[key as 'private' | 'dot'] ? key : `no ${key}`;
+}
+
+function describeKeys(keys: string[], values: ConfigValues): string {
+  return keys.map((key) => describeValue(key, values)).join(', ');
+}
+
+function showHelp(name: string, config: ConfigResult | null): void {
+  const values = config ? config.values : {};
+  const from = (key: string): string => (key in values ? ', from config' : '');
+  const defaultDepth = `${values.depth === undefined ? 1 : values.depth}${from('depth')}`;
+  const defaultPrivate = `${values.private ? 'on' : 'off'}${from('private')}`;
+  const defaultDot = `${values.dot ? 'on' : 'off'}${from('dot')}`;
+  const configured = values.exclude && values.exclude.length ? `; config adds ${values.exclude.join(',')}` : '';
+  console.log(`${name} v${getVersion()}`);
   console.log('');
   console.log(`Usage: ${name} [options] <command> [args...]
 
 Run commands in each package folder within a monorepo.
 
 Options:
-  -d, --depth <n>        Maximum package.json depth to search for packages (default: 1)
-  -c, --concurrency <n>  Number of packages to process in parallel (default: cpu)
-  -t, --topological      Process packages in topological order based on dependencies
-  -fd, --fail-dependents Skip packages whose dependencies failed (use with -t)
-  -e, --expanded         Use expanded terminal UI for output
+  -d, --depth <n>        Maximum package.json depth to search (default: ${defaultDepth}). Depth counts package.json levels, not folders.
+  -c, --concurrency <n>  Packages processed in parallel (default: cpu)
+  -t, --topological      Process packages in dependency order
+      --fail-dependents  Skip packages whose dependencies failed (use with -t)
+  -e, --expanded         Expanded terminal UI
   -s, --streaming        Stream output as it happens
-  -si, --silent          Suppress output
-  -p, --private          Include private packages
-  -i, --ignore <pattern> Ignore packages matching pattern (default: node_modules,.git)
+      --silent           Suppress output
+  -p, --private          Include private packages (default: ${defaultPrivate}; --no-private to exclude)
+  -x, --exclude <list>   Also skip folders matching these names or globs (repeatable; adds to node_modules${configured})
+      --dot              Also enter dot-prefixed folders (default: ${defaultDot}; .git is always skipped; --no-dot to skip them)
+      --no-config        Ignore ~/.config/each-package/config.json
+  -i, --ignore <list>    Deprecated, will be removed in a future major: replaces the skip list, so node_modules is no longer skipped. Use -x.
   -r, --root             Include the root package
-  -I, --interactive      Enable interactive mode (default: true)
+  -I, --interactive      Interactive mode (default: true)
   -v, --version          Show version number
   -h, --help             Show this help message
 
+Skipped always: .git. Skipped by default: dot-prefixed folders, node_modules.`);
+  if (config) console.log(`\nConfig: ${config.error ? config.error.message : config.path}${config.error || !Object.keys(values).length ? '' : ` (${describeKeys(Object.keys(values), values)})`}`);
+  console.log(`
 Examples:
   ${name} npm install      Run 'npm install' in each package
   ${name} -t npm test      Run 'npm test' in topological order
   ${name} -c 4 npm build   Run 'npm build' with concurrency of 4`);
 }
 
-const concurrency = Math.min(64, Math.max(8, (os.cpus()?.length ?? 4) * 8));
-
 export default (argv: string[], name: string): void => {
-  const options = getopts(argv, {
-    alias: { depth: 'd', concurrency: 'c', topological: 't', failDependents: 'fd', expanded: 'e', streaming: 's', silent: 'si', private: 'p', ignore: 'i', root: 'r', interactive: 'I', version: 'v', help: 'h' },
-    boolean: ['topological', 'failDependents', 'expanded', 'streaming', 'silent', 'private', 'root', 'interactive', 'version', 'help'],
-    default: { depth: 1, concurrency, interactive: true },
-    stopEarly: true,
-  });
+  // booleans cannot be told from absent in one parse, so two parses with opposite defaults find the typed ones
+  const typedOn = parse(argv, { config: true, private: true, dot: true });
+  const typedOff = parse(argv, { config: true, private: false, dot: false });
+  const isTyped = (key: string): boolean => (key === 'depth' ? typedOn.depth !== undefined : typedOn[key] === typedOff[key]);
 
-  if (options.version) {
+  if (typedOn.version) {
     console.log(getVersion());
     exit(0);
     return;
   }
 
-  if (options.help) {
-    showHelp(name);
+  const config: ConfigResult = typedOn.config === false ? { path: '', values: {} } : loadConfig();
+  if (typedOn.help) {
+    showHelp(name, typedOn.config === false ? null : config);
     exit(0);
     return;
+  }
+  if (config.error) {
+    console.log(`${name}: ${config.error.message}`);
+    exit(ERROR_CODE);
+    return;
+  }
+
+  const { exclude: configExclude, ...configScalars } = config.values;
+  const options = parse(argv, { depth: 1, concurrency, interactive: true, ...configScalars });
+  if (typeof options.depth !== 'number' || !(options.depth >= 1) || options.depth % 1 !== 0) {
+    console.log(`${name}: --depth must be an integer of 1 or more`);
+    exit(ERROR_CODE);
+    return;
+  }
+
+  // a flag followed by another flag has no value; stop rather than run with an empty skip list
+  if (typedOn.ignore === true || typedOn.exclude === true) {
+    console.log(`${name}: ${typedOn.ignore === true ? '-i/--ignore' : '-x/--exclude'} needs a value`);
+    exit(ERROR_CODE);
+    return;
+  }
+  const ignoreTyped = typedOn.ignore !== undefined;
+  const excludeTyped = typedOn.exclude !== undefined;
+  if (ignoreTyped && excludeTyped) {
+    console.log(`${name}: -i/--ignore and -x/--exclude cannot be combined; use --exclude only (-i is deprecated and replaces the skip list, so -i also stopped skipping node_modules)`);
+    exit(ERROR_CODE);
+    return;
+  }
+  // a typed -i is the whole skip list, so config exclude entries are not in effect
+  options.exclude = ignoreTyped ? [] : toList(configExclude).concat(toList(typedOn.exclude));
+
+  if (!options.silent) {
+    if (ignoreTyped) console.error(`${name}: -i/--ignore is deprecated and will be removed in a future major release; use -x/--exclude, which adds to the skip list instead of replacing it (-i also stops skipping node_modules)`);
+    const shown: string[] = [];
+    if (config.values.depth !== undefined && !isTyped('depth')) shown.push('depth');
+    if (config.values.private !== undefined && !isTyped('private')) shown.push('private');
+    if (config.values.dot !== undefined && !isTyped('dot')) shown.push('dot');
+    if (configExclude && configExclude.length && !ignoreTyped) shown.push('exclude');
+    if (shown.length) console.error(`${name}: config ${config.path}: ${describeKeys(shown, config.values)}`);
   }
 
   const args = options._;

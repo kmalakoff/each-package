@@ -5,6 +5,8 @@ import path from 'path';
 import removeBOM from 'remove-bom-buffer';
 import match from 'test-match';
 import Graph, { type DependencyGraph } from 'topological-sort-group';
+import { DEFAULT_EXCLUDES, GIT_DIR } from '../constants.ts';
+import toList from './toList.ts';
 
 const concurrency = Math.min(64, Math.max(8, (os.cpus()?.length ?? 4) * 8));
 
@@ -17,15 +19,15 @@ import type { EachOptions } from '../types.ts';
 
 export type Callback = (err: Error | null, entries?: PackageEntry[], graph?: DependencyGraph<PackageEntry>) => void;
 
-const defaultIgnores = 'node_modules,.git';
-
 export default function packageLayers(options: EachOptions, callback: Callback): void {
   const depth = typeof options.depth === 'undefined' ? Infinity : options.depth;
 
   const cwd = options.cwd || process.cwd();
 
-  const ignores = options.ignore ? options.ignore : defaultIgnores;
-  const matcher = match({ exclude: ignores });
+  // a typed ignore is the whole skip list; exclude always adds to it
+  const ignored = toList(options.ignore);
+  const base = ignored.length ? ignored : DEFAULT_EXCLUDES;
+  const matcher = match({ exclude: base.concat(toList(options.exclude)) });
   // depth is relative to the first level of packages (the root's own package.json is not a level, it is included via root: true)
   // depth is the count of package.json files below cwd, so folders without a package.json don't count
   const levels: Record<string, number> = {};
@@ -40,7 +42,9 @@ export default function packageLayers(options: EachOptions, callback: Callback):
         return cb(null, true);
       }
       if (!(entry.stats?.isDirectory() || entry.realStats?.isDirectory())) return cb(null, false);
-      if (entry.basename[0] === '.' || !matcher(entry.basename)) return cb(null, false);
+      if (entry.basename === GIT_DIR) return cb(null, false);
+      if (!options.dot && entry.basename[0] === '.') return cb(null, false);
+      if (!matcher(entry.basename)) return cb(null, false);
       const parent = path.dirname(entry.path);
       const parentLevel = levels[parent] || 0;
       // every package below here is at least parentLevel + 1 deep

@@ -1,1 +1,1 @@
-ignores: ["each-package", "node-version-use", "ts-dev-stack"]
+ignores: ["each-package", "node-version-use", "ts-dev-stack", "homedir-polyfill"]

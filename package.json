@@ -1,7 +1,7 @@
 {
   "name": "each-package",
   "version": "1.7.2",
-  "description": "Run commands in each package folder starting with cwd skipping node_modules folders",
+  "description": "Run commands in each package folder starting with cwd, skipping node_modules, dot-prefixed folders and .git",
   "keywords": [
     "each",
     "package",
@@ -44,6 +44,7 @@
     "exit-compat": "^1.0.0",
     "fs-iterator": "^7.0.0",
     "getopts-compat": "^2.2.5",
+    "homedir-polyfill": "^1.0.3",
     "queue-cb": "^1.0.0",
     "remove-bom-buffer": "^3.0.0",
     "spawn-streaming": "^1.1.15",
@@ -56,8 +57,10 @@
     "@types/mocha": "*",
     "@types/node": "*",
     "cr": "^0.1.0",
+    "fs-remove-compat": "^1.1.1",
     "is-version": "^1.0.9",
     "maximize-iterator": "*",
+    "mkdirp-classic": "^0.5.3",
     "node-version-use": "*",
     "pinkie-promise": "*",
     "ts-dev-stack": "*",

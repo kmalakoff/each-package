@@ -1,9 +1,11 @@
 import assert from 'assert';
 import eachPackage from 'each-package';
+import { safeRmSync } from 'fs-remove-compat';
 import isVersion from 'is-version';
 import path from 'path';
 import Pinkie from 'pinkie-promise';
 import url from 'url';
+import { createScratch, type Scratch, writeConfig } from '../lib/configFixture.ts';
 import getLines from '../lib/getLines.ts';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
@@ -109,6 +111,51 @@ describe('library', () => {
         assert.ok(isVersion(getLines(results[0]?.result?.stdout ?? '').slice(-1)[0], 'v'));
         done();
       });
+    });
+  });
+
+  describe('dot and exclude', () => {
+    let scratch: Scratch;
+    let originalHome: string | undefined;
+    let originalProfile: string | undefined;
+    before(() => {
+      scratch = createScratch('api');
+      // a config that would change the result if the library read it
+      writeConfig(scratch, { version: 1, private: true, dot: true, exclude: ['a'] });
+      originalHome = process.env.HOME;
+      originalProfile = process.env.USERPROFILE;
+      process.env.HOME = scratch.home;
+      process.env.USERPROFILE = scratch.home;
+    });
+    after(() => {
+      if (originalHome === undefined) delete process.env.HOME;
+      else process.env.HOME = originalHome;
+      if (originalProfile === undefined) delete process.env.USERPROFILE;
+      else process.env.USERPROFILE = originalProfile;
+      safeRmSync(scratch.dir, { recursive: true, force: true });
+    });
+
+    function visited(options: Record<string, unknown>, callback: (err: Error | null, names?: string[]) => void): void {
+      eachPackage(NODE, ['--version'], { silent: true, expanded: true, encoding: 'utf8', cwd: scratch.group, depth: 2, ...options }, (err, results) => {
+        if (err || !results) return callback(err ?? new Error('No results'));
+        callback(null, results.map((r) => path.basename(r.path)).sort());
+      });
+    }
+
+    function expectVisited(options: Record<string, unknown>, expected: string[], done: (err?: Error) => void): void {
+      visited(options, (err, names) => {
+        if (err) return done(err);
+        try {
+          assert.deepEqual(names, expected);
+        } catch (e) {
+          return done(e as Error);
+        }
+        done();
+      });
+    }
+
+    it('dot and exclude reach the walk, and the config file is never read', (done) => {
+      expectVisited({ dot: true, exclude: 'vendor' }, ['a', 'c', 'f', 'g', 't', 'w'], done);
     });
   });
 
