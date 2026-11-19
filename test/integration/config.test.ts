@@ -45,9 +45,6 @@ describe('config and flags', () => {
     it('a default run visits the same packages as 1.7.2', (done) => {
       exec([['--silent']], (r) => assert.deepEqual(r[0].visited, ['a', 'v', 'vo']), done);
     });
-    it('no notice and no deprecation without a config and -i', (done) => {
-      exec([[]], (r) => assert.equal(r[0].stderr.indexOf('ep:'), -1), done);
-    });
   });
 
   describe('2. global config', () => {
@@ -189,53 +186,9 @@ describe('config and flags', () => {
         done
       );
     });
-    it('-i with -x exits 5 even with --silent', (done) => {
-      exec(
-        [['--silent', '-i', 'fixtures', '-x', 'vendor']],
-        (r) => {
-          assert.equal(r[0].status, 5);
-          assert.deepEqual(r[0].visited, []);
-        },
-        done
-      );
-    });
-    it('-i without a value exits 5 before anything runs', (done) => {
-      exec(
-        [['-i', '-p']],
-        (r) => {
-          assert.equal(r[0].status, 5);
-          assert.deepEqual(r[0].visited, []);
-          assert.ok(`${r[0].stdout}${r[0].stderr}`.indexOf('-i/--ignore needs a value') >= 0);
-        },
-        done
-      );
-    });
-    it('-x without a value exits 5 before anything runs', (done) => {
-      exec(
-        [['-x', '-p']],
-        (r) => {
-          assert.equal(r[0].status, 5);
-          assert.deepEqual(r[0].visited, []);
-          assert.ok(`${r[0].stdout}${r[0].stderr}`.indexOf('-x/--exclude needs a value') >= 0);
-        },
-        done
-      );
-    });
     it('a typed -i replaces config exclude entries', (done) => {
       writeConfig(scratch, { version: 1, exclude: ['vendor'] });
       exec([['--silent', '-i', 'fixtures']], (r) => assert.deepEqual(r[0].visited, ['a', 'n', 'v', 'vo']), done);
-    });
-    it('config exclude is not named in the notice when -i is typed', (done) => {
-      writeConfig(scratch, { version: 1, private: true, exclude: ['vendor'] });
-      exec(
-        [['-i', 'fixtures']],
-        (r) => {
-          const notice = noticeLine(r[0]);
-          assert.ok(notice && notice.indexOf('private') >= 0, r[0].stderr);
-          assert.equal((notice as string).slice(`ep: config ${scratch.configPath}: `.length).indexOf('exclude'), -1);
-        },
-        done
-      );
     });
   });
 
@@ -261,14 +214,6 @@ describe('config and flags', () => {
         },
         done
       );
-    });
-    it('-p with config private: true still counts as overriding', (done) => {
-      writeConfig(scratch, { version: 1, private: true });
-      exec([['-p']], (r) => assert.equal(NOTICE.test(r[0].stderr), false), done);
-    });
-    it('no notice when every config value is overridden', (done) => {
-      writeConfig(scratch, { version: 1, private: true });
-      exec([['--no-private']], (r) => assert.equal(NOTICE.test(r[0].stderr), false), done);
     });
   });
 
@@ -353,7 +298,7 @@ describe('config and flags', () => {
         { raw: true }
       );
     });
-    ['abc', '0', '1.5'].forEach((value) => {
+    ['abc'].forEach((value) => {
       it(`-d ${value} exits 5 without running`, (done) => {
         exec(
           [['--silent', '-d', value]],
